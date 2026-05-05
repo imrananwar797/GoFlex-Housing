@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import http from 'http';
-import { Server } from 'socket.io';
 import authRoutes from './routes/auth.routes';
 import propertyRoutes from './routes/property.routes';
 import bookingRoutes from './routes/booking.routes';
@@ -15,17 +14,13 @@ import referralRoutes from './routes/referral.routes';
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST']
-  }
-});
 
 const PORT = process.env.PORT || 8000;
 
-app.use(cors());
+app.use(cors({
+  origin: true, // Reflect request origin in production
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
@@ -42,15 +37,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'GoFlex Core' });
 });
 
-// Socket.io connection
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-  
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
+// For local Docker/development
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Node.js Core Backend running on port ${PORT}`);
   });
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`Node.js Core Backend running on port ${PORT}`);
-});
+export default app;
