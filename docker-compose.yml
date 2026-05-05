@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-goflex_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-goflex_secure_password_123}
+      POSTGRES_DB: ${DB_NAME:-goflex_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - goflex_network
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - goflex_network
+
+  # Node.js Core Backend (System of Record)
+  backend-core:
+    build: ./api/core
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-goflex_user}:${DB_PASSWORD:-goflex_secure_password_123}@db:5432/${DB_NAME:-goflex_db}
+      AI_SERVICE_URL: http://backend-ai:8001
+      INTERNAL_SECRET: ${INTERNAL_SECRET:-goflex-internal-m2m-secret}
+      SECRET_KEY: ${SECRET_KEY:-production-secret-key}
+      PORT: 8000
+    depends_on:
+      - db
+      - redis
+    networks:
+      - goflex_network
+    ports:
+      - "8000:8000"
+
+  # Python AI Microservice (System of Intelligence)
+  backend-ai:
+    build: ./api/ai
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-goflex_user}:${DB_PASSWORD:-goflex_secure_password_123}@db:5432/${DB_NAME:-goflex_db}
+      INTERNAL_SECRET: ${INTERNAL_SECRET:-goflex-internal-m2m-secret}
+      SECRET_KEY: ${SECRET_KEY:-production-secret-key}
+    depends_on:
+      - db
+    networks:
+      - goflex_network
+    ports:
+      - "8001:8001"
+
+  frontend:
+    build: ./apps/frontend
+    environment:
+      VITE_API_URL: http://localhost:8000
+      VITE_SOCKET_URL: http://localhost:8000
+    ports:
+      - "80:80"
+    depends_on:
+      - backend-core
+    networks:
+      - goflex_network
+
+networks:
+  goflex_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

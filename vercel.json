@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/v1/core/:path*",
+      "destination": "/api/core/index.ts"
+    },
+    {
+      "source": "/api/v1/ai/:path*",
+      "destination": "/api/ai/main.py"
+    }
+  ],
+  "functions": {
+    "api/core/*.ts": {
+      "runtime": "vercel-node@latest"
+    },
+    "api/ai/*.py": {
+      "runtime": "vercel-python@latest"
+    }
+  }
+}

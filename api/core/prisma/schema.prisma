@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  RESIDENT
+  OWNER
+}
+
+model User {
+  id                 Int      @id @default(autoincrement())
+  username           String   @unique
+  email              String   @unique
+  password_hash      String
+  full_name          String
+  phone              String?
+  role               Role     @default(RESIDENT)
+  two_factor_enabled Boolean  @default(false)
+  two_factor_secret  String?
+  referral_code      String   @unique
+  referred_by        String?
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  bookings     Booking[]
+  payments     PaymentTransaction[]
+  kyc          KYC?
+  escrow       EscrowAccount?
+  fraud_alerts FraudAlert[]
+  reviews      Review[]
+  messages     Message[]
+  notifications Notification[]
+}
+
+model Property {
+  id               Int      @id @default(autoincrement())
+  name             String
+  description      String?
+  state_iso        String
+  city             String
+  rent             Float
+  beds             String
+  occupancy        Int      @default(0)
+  active           bool     @default(true)
+  cover_image_url  String?
+  matterport_url   String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  bookings Booking[]
+  reviews  Review[]
+}
+
+model Booking {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  property_id    Int
+  check_in_date  DateTime
+  check_out_date DateTime
+  status         String   @default("pending") // pending, confirmed, active, completed, cancelled
+  total_amount   Float
+  created_at     DateTime @default(now())
+
+  user     User     @relation(fields: [user_id], references: [id])
+  property Property @relation(fields: [property_id], references: [id])
+}
+
+model PaymentTransaction {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  booking_id     Int?
+  amount         Float
+  method         String   // card, upi, netbanking
+  status         String   @default("pending") // pending, completed, failed, refunded
+  transaction_id String?  @unique
+  created_at     DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model EscrowAccount {
+  id             Int      @id @default(autoincrement())
+  user_id        Int      @unique
+  balance        Float    @default(0)
+  held_amount    Float    @default(0)
+  disputed_total Float    @default(0)
+  status         String   @default("active")
+  updated_at     DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model FraudAlert {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  type        String
+  risk_score  Float
+  details     String?
+  resolved    Boolean  @default(false)
+  created_at  DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model KYC {
+  id              Int      @id @default(autoincrement())
+  user_id         Int      @unique
+  document_type   String
+  document_number String
+  document_url    String
+  status          String   @default("pending") // pending, verified, rejected
+  created_at      DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  property_id Int
+  rating      Int
+  comment     String?
+  created_at  DateTime @default(now())
+
+  user     User     @relation(fields: [user_id], references: [id])
+  property Property @relation(fields: [property_id], references: [id])
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  sender_id  Int
+  content    String
+  created_at DateTime @default(now())
+
+  sender User @relation(fields: [sender_id], references: [id])
+}
+
+model Notification {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  title      String
+  message    String
+  read       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+}

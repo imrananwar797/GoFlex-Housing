@@ -1,0 +1,22 @@
+{
+  "name": "goflex-housing-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "api/*"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "dev:core": "npm run dev --workspace=api/core",
+    "dev:ai": "cd api/ai && uvicorn main:app --reload --port 8001",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "latest"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.3"
+  }
+}

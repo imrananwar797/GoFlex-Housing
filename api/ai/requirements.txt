@@ -1,0 +1,66 @@
+# FastAPI and ASGI server
+fastapi
+uvicorn[standard]
+
+# Database
+sqlalchemy
+psycopg2-binary
+alembic
+
+# Authentication & Security
+python-jose[cryptography]
+passlib[bcrypt]
+cryptography
+
+# Data validation
+pydantic
+pydantic-settings
+email-validator
+
+# AI/ML Libraries (Optional - only if using face recognition)
+# opencv-python  # Requires C++ compiler
+# face-recognition  # Requires dlib
+# dlib  # Requires C++ compiler
+pillow
+
+# HTTP Requests
+httpx
+requests
+
+# Date/Time Handling
+python-dateutil
+pytz
+
+# Environment Management
+python-dotenv
+
+# Logging
+structlog
+
+# File Upload
+aiofiles
+
+# Testing
+pytest
+pytest-asyncio
+
+# Two-Factor Authentication
+pyotp
+
+# Additional packages
+slowapi
+fastapi-mail
+twilio
+redis
+python-socketio
+qrcode
+stripe
+python-multipart
+gunicorn
+sentry-sdk
+
+# Add to backend/requirements.txt
+python-socketio==5.10.0
+fastapi-mail==1.4.1
+twilio==8.10.0
+jinja2==3.1.2
