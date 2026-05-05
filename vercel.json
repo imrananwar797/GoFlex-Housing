@@ -8,14 +8,18 @@
     {
       "source": "/api/v1/ai/:path*",
       "destination": "/api/ai/main.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/apps/frontend/$1"
     }
   ],
   "functions": {
-    "api/core/*.ts": {
-      "runtime": "vercel-node@latest"
+    "api/core/index.ts": {
+      "runtime": "@vercel/node"
     },
-    "api/ai/*.py": {
-      "runtime": "vercel-python@latest"
+    "api/ai/main.py": {
+      "runtime": "@vercel/python"
     }
   }
 }
