@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "outputDirectory": "apps/frontend/dist",
   "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/api/v1/core/:path*",
@@ -12,8 +12,12 @@
       "destination": "/api/ai.py"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/assets/:path*",
+      "destination": "/apps/frontend/dist/assets/:path*"
+    },
+    {
+      "source": "/((?!api/|assets/).*)",
+      "destination": "/apps/frontend/dist/index.html"
     }
   ],
   "functions": {
