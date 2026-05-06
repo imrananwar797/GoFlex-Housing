@@ -4,6 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "uvicorn main:app --reload --port 8001",
-    "build": "echo 'No build step for Python AI'"
+    "compile": "echo 'No build step for Python AI'"
   }
 }

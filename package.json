@@ -16,6 +16,7 @@
     "dev:core": "npm run dev --workspace=backend/core",
     "dev:ai": "npm run dev --workspace=backend/ai",
     "build": "turbo run build",
+    "vercel-build": "cd backend/core && npx prisma generate && cd ../.. && turbo run build --filter=frontend",
     "lint": "turbo run lint"
   },
   "devDependencies": {

@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "outputDirectory": "apps/frontend/dist",
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/api/v1/core/:path*",
@@ -11,17 +13,17 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/apps/frontend/$1"
+      "destination": "/index.html"
     }
   ],
   "functions": {
     "api/core.ts": {
       "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 15
     },
     "api/ai.py": {
       "memory": 1024,
-      "maxDuration": 15
+      "maxDuration": 20
     }
   }
 }

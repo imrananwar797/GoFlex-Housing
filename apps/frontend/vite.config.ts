@@ -4,15 +4,9 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  root: '.',
   build: {
-    outDir: 'public/dist',
-    emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        main: 'src/index.tsx',
-      },
-    },
+    outDir: 'dist',
+    emptyOutDir: true
   },
   server: {
     proxy: {
