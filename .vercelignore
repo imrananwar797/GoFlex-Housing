@@ -1,0 +1,29 @@
+# Build artifacts
+node_modules
+dist
+.turbo
+
+# Ignore EVERYTHING except the entry points and the backend source
+# Actually, Vercel needs the backend source to build the entry points.
+# So I just need to make sure Vercel doesn't see other .ts/.py files in the root api/ folder.
+
+# Since api/ now ONLY contains core.ts and ai.py, we are good.
+
+# But let's ignore non-essential backend stuff
+backend/core/prisma
+backend/ai/tests
+backend/ai/venv
+backend/ai/logs
+
+# IDEs
+.vscode
+.idea
+.trae
+.gemini
+.antigravity
+.brain
+knowledge
+implementation_plan.md
+task.md
+walkthrough.md
+scratch

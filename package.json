@@ -3,20 +3,23 @@
   "version": "1.0.0",
   "private": true,
   "packageManager": "npm@10.2.4",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "workspaces": [
     "apps/*",
-    "api/*"
+    "backend/*"
   ],
   "scripts": {
     "dev": "turbo run dev",
     "dev:frontend": "npm run dev --workspace=apps/frontend",
-    "dev:core": "npm run dev --workspace=api/core",
-    "dev:ai": "npm run dev --workspace=api-ai",
+    "dev:core": "npm run dev --workspace=backend/core",
+    "dev:ai": "npm run dev --workspace=backend/ai",
     "build": "turbo run build",
     "lint": "turbo run lint"
   },
   "devDependencies": {
-    "turbo": "latest"
+    "turbo": "^2.9.9"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3"

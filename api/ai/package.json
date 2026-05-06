@@ -1,8 +1,0 @@
-{
-  "name": "api-ai",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "uvicorn main:app --reload --port 8001"
-  }
-}

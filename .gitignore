@@ -76,3 +76,4 @@ scratch/
 *.exe
 *.tar.gz
 supabase/
+.vercel

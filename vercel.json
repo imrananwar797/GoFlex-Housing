@@ -3,11 +3,11 @@
   "rewrites": [
     {
       "source": "/api/v1/core/:path*",
-      "destination": "/api/core/index.ts"
+      "destination": "/api/core.ts"
     },
     {
       "source": "/api/v1/ai/:path*",
-      "destination": "/api/ai/main.py"
+      "destination": "/api/ai.py"
     },
     {
       "source": "/(.*)",
@@ -15,11 +15,11 @@
     }
   ],
   "functions": {
-    "api/core/index.ts": {
+    "api/core.ts": {
       "memory": 1024,
       "maxDuration": 10
     },
-    "api/ai/main.py": {
+    "api/ai.py": {
       "memory": 1024,
       "maxDuration": 15
     }
