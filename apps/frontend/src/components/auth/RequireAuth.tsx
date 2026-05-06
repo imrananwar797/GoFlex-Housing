@@ -7,6 +7,6 @@ export default function RequireAuth({ role, children }: { role?: Role; children:
   const { user } = useAuth();
   const location = useLocation();
   if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
-  if (role && user.role !== role) return <Navigate to={user.role === 'admin' ? '/dashboard-admin' : '/dashboard'} replace />;
+  if (role && user.role.toLowerCase() !== role.toLowerCase()) return <Navigate to={user.role.toLowerCase() === 'admin' ? '/dashboard-admin' : '/dashboard'} replace />;
   return <>{children}</>;
 }

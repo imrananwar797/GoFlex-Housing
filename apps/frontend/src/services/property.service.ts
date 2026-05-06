@@ -3,7 +3,7 @@ import { api } from './api';
 type BedsType = 'Single' | 'Double' | 'Triple';
 
 export type PropertyRecord = {
-  id: string;
+  id: number;
   name: string;
   slug?: string;
   state_iso: string;

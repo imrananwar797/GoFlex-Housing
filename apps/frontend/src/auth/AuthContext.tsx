@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { authService, AuthUser, Role } from '../services/auth.service';
 import { supabaseService } from '../services/supabase.service';
+import { socketService } from '../services/socket.service';
 
 interface AuthContextValue {
   user: AuthUser | null;

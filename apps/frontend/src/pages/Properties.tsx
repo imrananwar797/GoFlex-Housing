@@ -58,8 +58,12 @@ export default function Properties(){
 
   return (
     <PageTransition>
-      <section className="content-wrap">
-        <h1 className="page-title">Properties</h1>
+      <section className="content-wrap pt-40">
+        <div className="section-header">
+          <span className="section-eyebrow">Inventory</span>
+          <h1 className="section-title">Discover Your Future Home</h1>
+          <p className="section-subtitle">Browse through our curated selection of high-performance living spaces designed for modern residents.</p>
+        </div>
         <div className="filter-grid">
           <input className="input" placeholder="Search name" value={q} onChange={e=>setQ(e.target.value)} />
           <select className="input" value={stateIso} onChange={(e)=>{setStateIso(e.target.value); setCity('');}}>

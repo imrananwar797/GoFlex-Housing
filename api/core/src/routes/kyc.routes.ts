@@ -7,7 +7,7 @@ const router = Router();
 router.use(authenticateJWT);
 
 router.post('/upload', uploadKYCDocument);
-router.post('/upload-file', uploadFile);
+// router.post('/upload-file', uploadFile);
 router.get('/status', getKYCStatus);
 
 export default router;

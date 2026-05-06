@@ -7,7 +7,10 @@ from app.core.database import engine
 from app.models import messaging_models
 from app.models.database_models import Base
 import sentry_sdk
-from app.routers import (recommendations, fraud, video, storage, pricing)
+from app.routers import (
+    recommendations, fraud, video, storage, pricing, subscriptions,
+    owner, analytics, payments, admin, inventory, messages, reviews, search, kyc
+)
 from app.services.socket_manager import socket_app
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -83,6 +86,16 @@ app.include_router(recommendations.router, prefix="/api/recommendations", tags=[
 app.include_router(video.router, prefix="/api/video", tags=["video"])
 app.include_router(storage.router, prefix="/api/storage", tags=["storage"])
 app.include_router(pricing.router, tags=["pricing"])
+app.include_router(subscriptions.router, prefix="/api/subscriptions", tags=["subscriptions"])
+app.include_router(owner.router, prefix="/api/owner", tags=["owner"])
+app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
+app.include_router(payments.router, prefix="/api/payments", tags=["payments"])
+app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+app.include_router(inventory.router, prefix="/api/inventory", tags=["inventory"])
+app.include_router(messages.router, prefix="/api/messages", tags=["messages"])
+app.include_router(reviews.router, prefix="/api/reviews", tags=["reviews"])
+app.include_router(search.router, prefix="/api/search", tags=["search"])
+app.include_router(kyc.router, prefix="/api/kyc", tags=["kyc"])
 
 
 @app.get("/", tags=["root"])

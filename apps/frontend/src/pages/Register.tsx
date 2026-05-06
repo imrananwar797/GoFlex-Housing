@@ -49,6 +49,7 @@ export default function Register() {
           <label className="form-group"><span className="form-label">Register as</span>
             <select className="input" value={role} onChange={(e)=>setRole(e.target.value as Role)}>
               <option value="resident">Resident</option>
+              <option value="owner">Owner</option>
               <option value="admin">Admin</option>
             </select>
           </label>

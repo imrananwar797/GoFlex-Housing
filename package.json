@@ -2,14 +2,16 @@
   "name": "goflex-housing-monorepo",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.2.4",
   "workspaces": [
     "apps/*",
     "api/*"
   ],
   "scripts": {
+    "dev": "turbo run dev",
     "dev:frontend": "npm run dev --workspace=apps/frontend",
     "dev:core": "npm run dev --workspace=api/core",
-    "dev:ai": "cd api/ai && uvicorn main:app --reload --port 8001",
+    "dev:ai": "npm run dev --workspace=api-ai",
     "build": "turbo run build",
     "lint": "turbo run lint"
   },

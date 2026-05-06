@@ -27,7 +27,7 @@ export default function BlogPost() {
     const fetchPost = async () => {
       try {
         const response = await api.get(`/api/blog/${slug}`);
-        setPost(response.data.data);
+        setPost(response.data);
       } catch (error) {
         console.error('Failed to fetch blog post:', error);
       } finally {
@@ -106,9 +106,18 @@ export default function BlogPost() {
           </div>
 
           <div className="blog-post-body">
-            {post.content.split('\n').map((paragraph, idx) => (
-              <p key={idx}>{paragraph}</p>
-            ))}
+            {post.content.split('\n').map((line, idx) => {
+              if (line.startsWith('### ')) {
+                return <h2 key={idx} className="blog-post-subtitle">{line.replace('### ', '')}</h2>;
+              }
+              if (line.startsWith('**') && line.endsWith('**')) {
+                return <p key={idx}><strong>{line.replace(/\*\*/g, '')}</strong></p>;
+              }
+              if (line.trim() === '') {
+                return <br key={idx} />;
+              }
+              return <p key={idx}>{line}</p>;
+            })}
           </div>
 
           <div className="blog-post-footer">

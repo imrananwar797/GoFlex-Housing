@@ -11,7 +11,8 @@ from app.core.security import (create_access_token, decode_token,
                                get_password_hash, verify_password)
 from app.models.database_models import User, UserRole
 from app.schemas.auth_schemas import (LoginRequest, PasswordChange, Token,
-                                      TokenData, UserCreate, UserResponse)
+                                      TokenData, UserCreate, UserResponse,
+                                      LoginResponse, TwoFactorValidate)
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -35,7 +36,7 @@ def authenticate_user(db: Session, username: str, password: str) -> User:
     user = get_user_by_username(db, username)
     if not user:
         user = get_user_by_email(db, username)
-    if not user or not verify_password(password, user.hashed_password):
+    if not user or not verify_password(password, user.password_hash):
         return None
     return user
 
@@ -94,7 +95,7 @@ def register(user_data: UserCreate, db: Session=Depends(get_db)):
         full_name=user_data.full_name,
         phone=user_data.phone,
         role=user_data.role,
-        hashed_password=hashed_password,
+        password_hash=hashed_password,
         is_active=True
     )
     
@@ -186,14 +187,14 @@ def change_password(password_data: PasswordChange, token: str=None, db: Session=
     user = get_current_user(token, db)
     
     # Verify current password
-    if not verify_password(password_data.current_password, user.hashed_password):
+    if not verify_password(password_data.current_password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect current password"
         )
     
     # Update password
-    user.hashed_password = get_password_hash(password_data.new_password)
+    user.password_hash = get_password_hash(password_data.new_password)
     db.commit()
     
     return {"message": "Password updated successfully"}

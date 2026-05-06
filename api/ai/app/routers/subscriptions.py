@@ -20,7 +20,7 @@ def get_subscription_plans(
 ):
     """Get all active subscription plans"""
     plans = db.query(SubscriptionPlan).filter(SubscriptionPlan.active == True).all()
-    return {"plans": plans}
+    return {"data": plans}
 
 
 @router.post("/create-checkout-session")
@@ -109,7 +109,4 @@ def get_my_subscription(
         Subscription.status == 'active'
     ).first()
 
-    if subscription:
-        return {"subscription": subscription}
-    else:
-        return {"subscription": None}
+    return {"data": subscription}

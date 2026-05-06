@@ -9,8 +9,12 @@ export default function Locations(){
   const cities = useMemo(()=> City.getCitiesOfState('IN', stateIso) || [], [stateIso]);
 
   return (
-    <section className="content-wrap">
-      <h1 className="page-title">Locations</h1>
+    <section className="content-wrap pt-40">
+      <div className="section-header">
+        <span className="section-eyebrow">Network</span>
+        <h1 className="section-title">Expansive Footprint</h1>
+        <p className="section-subtitle">We are strategically located in India's leading tech hubs and metropolitan centers.</p>
+      </div>
       <div className="filter-grid">
         <select className="input" value={stateIso} onChange={(e)=>{setStateIso(e.target.value); setCity('');}}>
           {states.map(s => <option key={s.isoCode} value={s.isoCode}>{s.name}</option>)}

@@ -26,7 +26,7 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     full_name = Column(String(255), nullable=True)
     phone = Column(String(20), nullable=True)
-    hashed_password = Column(String(255), nullable=False)
+    password_hash = Column(String(255), nullable=False)
     role = Column(Enum(UserRole), default=UserRole.RESIDENT, nullable=False)
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
@@ -129,6 +129,7 @@ class Booking(Base):
     # Relationships
     property = relationship("Property", back_populates="bookings")
     room = relationship("Room")
+    resident = relationship("Resident")
 
 
 class FaceEncodingData(Base):
@@ -166,6 +167,7 @@ class PaymentTransaction(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     booking_id = Column(Integer, ForeignKey("bookings.id"), index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
     stripe_payment_id = Column(String(255), unique=True, index=True)
     amount = Column(Float, nullable=False)
     currency = Column(String(10), default="usd")
@@ -409,5 +411,3 @@ class FraudAlert(Base):
     # Relationships
     user = relationship("User")
     booking = relationship("Booking")
-
-

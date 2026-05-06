@@ -8,6 +8,7 @@ export interface AuthUser {
   email: string;
   role: Role;
   token?: string;
+  full_name?: string;
 }
 
 export interface LoginResponse {

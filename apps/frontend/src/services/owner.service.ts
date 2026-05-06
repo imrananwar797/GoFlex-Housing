@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = '/api';
 
 export interface OwnerProperty {
   id: string;
@@ -16,6 +16,8 @@ export interface OwnerProperty {
   avgRating: number;
   totalReviews: number;
   occupancyRate: number;
+  occupancy?: number;
+  cover_image_url?: string;
   createdAt: string;
 }
 
@@ -60,7 +62,16 @@ export interface PropertyRevenue {
 }
 
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
+  const raw = localStorage.getItem('goflex_auth_v1');
+  let token = '';
+  if (raw) {
+    try {
+      const user = JSON.parse(raw);
+      token = user.token || '';
+    } catch (e) {
+      console.error('Failed to parse auth token');
+    }
+  }
   return {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -144,6 +155,33 @@ export const ownerService = {
       headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error('Failed to fetch property revenue');
+    return response.json();
+  },
+
+  // Dashboard & Residents
+  async getDashboardStats(): Promise<{ stats: any; recent_bookings: any[] }> {
+    const response = await fetch(`${API_BASE}/owner/dashboard`, {
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error('Failed to fetch dashboard stats');
+    return response.json();
+  },
+
+  async getResidents(): Promise<{ data: any[] }> {
+    const response = await fetch(`${API_BASE}/owner/residents`, {
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error('Failed to fetch residents');
+    return response.json();
+  },
+
+  async issueBill(bookingId: number, amount: number, description: string): Promise<any> {
+    const response = await fetch(`${API_BASE}/owner/issue-bill`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ booking_id: bookingId, amount, description }),
+    });
+    if (!response.ok) throw new Error('Failed to issue bill');
     return response.json();
   },
 };

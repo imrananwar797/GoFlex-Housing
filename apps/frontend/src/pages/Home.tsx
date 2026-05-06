@@ -1,53 +1,38 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import PopularLocations from '../components/locations/PopularLocations';
 import AutoGallery from '../components/gallery/AutoGallery';
 import PropertyCard from '../components/dashboard/PropertyCard';
 import PageTransition from '../components/common/PageTransition';
+import StickyBookingBar from '../components/common/StickyBookingBar';
 import { fetchTestimonials, fetchFaqs, TestimonialRecord, FaqRecord } from '../services/content.service';
 import { integrationService } from '../services/integration.service';
-import { PropertyRecord } from '../services/property.service';
+import { 
+  Monitor, 
+  Cpu, 
+  Activity,
+  ArrowRight
+} from 'lucide-react';
 
-const metrics = [
-  { value: '20+', label: 'Cities', detail: 'National presence with hyperlocal teams' },
-  { value: '120+', label: 'Properties', detail: 'Curated co-living homes & studios' },
-  { value: '4.8', label: 'Avg. Rating', detail: 'Residents love the GoFlex experience' },
-  { value: '5k+', label: 'Residents', detail: 'Professionals thriving in our communities' }
-];
-
-const featureShowcase = [
+const valueProps = [
   {
-    title: 'Designer Rooms',
-    description: 'Fully furnished suites with natural light, ergonomic furniture, and premium finishes.',
-    image: 'https://images.pexels.com/photos/6585756/pexels-photo-6585756.jpeg',
-    alt: 'Designer bedroom'
+    title: 'Zero-CAPEX Workspace',
+    description: 'Elite workstations with Herman Miller seating and high-speed symmetric fiber, pre-integrated into your living suite.',
+    icon: Monitor,
+    color: 'text-neon-blue'
   },
   {
-    title: 'All-Inclusive Living',
-    description: 'Wi-Fi, utilities, laundry, and housekeeping bundled transparently in a single invoice.',
-    image: 'https://images.pexels.com/photos/6489127/pexels-photo-6489127.jpeg',
-    alt: 'Shared kitchen'
+    title: 'Tech-Enabled Ops',
+    description: 'Digital-first property management with instant KYC, IoT utility tracking, and smart access control.',
+    icon: Cpu,
+    color: 'text-neon-green'
   },
   {
-    title: 'Community Programming',
-    description: 'Weekly mixers, workshops, and wellness sessions curated by our community managers.',
-    image: 'https://images.pexels.com/photos/7651627/pexels-photo-7651627.jpeg',
-    alt: 'Coworking lounge'
-  }
-];
-
-const conciergeHighlights = [
-  {
-    title: 'Move-in Concierge',
-    detail: 'Personalised onboarding with digital KYC, luggage support, and curated welcome kits.'
-  },
-  {
-    title: 'Smart Facility Ops',
-    detail: 'IoT-enabled utilities tracking, predictive maintenance, and instant service tickets.'
-  },
-  {
-    title: 'Resident Success',
-    detail: 'Dedicated community managers, city guides, and resident-only events each week.'
+    title: 'Real-time Transparency',
+    description: 'Power BI style dashboards for residents and owners to track consumption, billing, and maintenance in real-time.',
+    icon: Activity,
+    color: 'text-neon-red'
   }
 ];
 
@@ -64,139 +49,102 @@ export default function Home() {
 
   useEffect(() => {
     let ignore = false;
-
-    fetchTestimonials(4)
-      .then((items) => {
-        if (!ignore) {
-          setTestimonials(items);
-        }
-      })
-      .catch((error) => {
-        console.error('Failed to load testimonials', error);
-      });
-
-    fetchFaqs()
-      .then((items) => {
-        if (!ignore) {
-          setFaqList(items);
-        }
-      })
-      .catch((error) => {
-        console.error('Failed to load faqs', error);
-      });
-
-    // Fetch AI Recommendations
+    fetchTestimonials(4).then(items => { if (!ignore) setTestimonials(items); });
+    fetchFaqs().then(items => { if (!ignore) setFaqList(items); });
     setRecLoading(true);
-    integrationService.getRecommendations()
-      .then(data => {
-        if (!ignore) setRecommendations(data.recommendations);
-      })
-      .catch(err => console.error('Failed to load recommendations', err))
-      .finally(() => {
-        if (!ignore) setRecLoading(false);
-      });
-
-    return () => {
-      ignore = true;
-    };
+    integrationService.getRecommendations().then(data => { if (!ignore) setRecommendations(data.recommendations); }).finally(() => { if (!ignore) setRecLoading(false); });
+    return () => { ignore = true; };
   }, []);
 
   return (
     <PageTransition>
-      <section className="hero-section">
-        <div className="hero-overlay">
-          <div className="hero-layout">
-            <article className="hero-intro">
-              <span className="section-eyebrow">Next-gen co-living</span>
-              <h1 className="hero-title">Premium Co-Living Suites for High-Performance Residents</h1>
-              <p className="hero-lede">Purpose-built residences that blend elevated interiors, tech-enabled amenities, and a concierge-grade community experience.</p>
-              <div className="hero-actions">
-                <a className="btn-cta" href="#contact">Book a discovery call</a>
-                <NavLink to="/properties" className="btn-ghost">Browse residences</NavLink>
-              </div>
-              <ul className="hero-points" aria-label="GoFlex assurances">
-                <li>✓ Instant digital onboarding</li>
-                <li>★ Curated amenities for remote work</li>
-                <li>🛡️ Verified partners & secure entrances</li>
-              </ul>
-              <div className="hero-metrics" aria-label="Key performance indicators">
-                {metrics.map((metric) => (
-                  <div key={metric.label} className="metric-card">
-                    <span className="metric-value">{metric.value}</span>
-                    <span className="metric-label">{metric.label}</span>
-                    <p className="metric-detail">{metric.detail}</p>
-                  </div>
+      {/* Hero Section */}
+      <section className="relative min-h-screen bg-obsidian-radial overflow-hidden flex items-center pt-20">
+        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/6585756/pexels-photo-6585756.jpeg')] bg-cover bg-center opacity-20 grayscale" />
+        <div className="absolute inset-0 bg-gradient-to-b from-obsidian/0 via-obsidian/80 to-obsidian" />
+        
+        <div className="relative z-20 max-w-7xl mx-auto px-8 grid lg:grid-cols-2 gap-20 items-center">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="inline-block px-4 py-1.5 rounded-full bg-neon-blue/10 border border-neon-blue/20 text-neon-blue text-[10px] font-black uppercase tracking-[0.3em] mb-8">
+              Future of PropTech
+            </span>
+            <h1 className="text-6xl lg:text-8xl font-black text-white leading-[1] tracking-tight mb-8">
+              Premium Living <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-purple-500">
+                High-Performance
+              </span> <br />
+              Residents.
+            </h1>
+            <p className="text-xl text-slate-400 max-w-xl mb-12 leading-relaxed">
+              Experience the world's first Cyberpunk-inspired co-living ecosystem. Tech-enabled, concierge-grade, and built for those who define the future.
+            </p>
+            <div className="flex flex-wrap gap-6">
+              <button className="px-10 py-5 bg-neon-blue text-obsidian font-black rounded-2xl flex items-center gap-3 hover:scale-[1.05] active:scale-[0.95] transition-transform shadow-neon-blue uppercase tracking-widest text-sm">
+                Explore Suites <ArrowRight size={18} />
+              </button>
+              <NavLink to="/properties" className="px-10 py-5 bg-white/5 border border-white/10 text-white font-black rounded-2xl flex items-center gap-3 hover:bg-white/10 transition-colors uppercase tracking-widest text-sm">
+                View Cities
+              </NavLink>
+            </div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
+            className="hidden lg:block relative"
+          >
+            <div className="absolute -inset-4 bg-neon-blue/20 blur-3xl rounded-full" />
+            <img 
+              src="https://images.pexels.com/photos/4874580/pexels-photo-4874580.jpeg" 
+              className="relative rounded-3xl border border-white/10 shadow-2xl grayscale hover:grayscale-0 transition-all duration-700" 
+              alt="Premium Suite" 
+            />
+            <div className="absolute -bottom-10 -right-10 bg-obsidian/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl max-w-xs">
+              <p className="text-neon-green text-3xl font-black tracking-tighter mb-1">92%</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Average Occupancy</p>
+              <div className="mt-4 flex -space-x-3">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-obsidian bg-slate-800" />
                 ))}
               </div>
-            </article>
-            <aside className="hero-preview">
-              <figure className="hero-preview-card">
-                <img
-                  className="hero-preview-img"
-                  loading="lazy"
-                  decoding="async"
-                  src={withParams('https://images.pexels.com/photos/4874580/pexels-photo-4874580.jpeg', 1920)}
-                  srcSet={[
-                    `${withParams('https://images.pexels.com/photos/4874580/pexels-photo-4874580.jpeg',1280)} 1280w`,
-                    `${withParams('https://images.pexels.com/photos/4874580/pexels-photo-4874580.jpeg',1920)} 1920w`,
-                    `${withParams('https://images.pexels.com/photos/4874580/pexels-photo-4874580.jpeg',2560)} 2560w`,
-                  ].join(', ')}
-                  sizes="(max-width: 640px) 90vw, (max-width: 1100px) 50vw, 520px"
-                  alt="Premium co-living exterior"
-                />
-                <figcaption className="hero-preview-meta">
-                  Sky Deck Residency • Bengaluru
-                  <span>92% occupancy · Concierge team on-site</span>
-                </figcaption>
-              </figure>
-              <div className="hero-highlight-card">
-                <span className="hero-highlight-label">What&apos;s new</span>
-                <h3>Executive suites launching in Mumbai</h3>
-                <p>Experience larger private studios, personal pantries, and skyline social lounges at Riverview House.</p>
-                <NavLink to="/gallery" className="hero-highlight-link">Preview concept gallery →</NavLink>
-              </div>
-            </aside>
-          </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Sticky Booking Bar */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-5xl px-8 z-30">
+          <StickyBookingBar />
         </div>
       </section>
 
-      <section className="content-wrap" aria-labelledby="why">
-        <div className="section-header">
-          <span id="why" className="section-eyebrow">Signature experience</span>
-          <h2 className="section-title">Built for comfort, community, and productivity</h2>
-          <p className="section-subtitle">Each GoFlex residence blends thoughtful design with hospitality standards to deliver a matte, refined living canvas that keeps residents inspired.</p>
-        </div>
-        <div className="feature-showcase">
-          {featureShowcase.map((feature) => (
-            <article key={feature.title} className="feature-card">
-              <div className="feature-content">
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-              </div>
-              <img
-                className="feature-media"
-                loading="lazy"
-                decoding="async"
-                src={withParams(feature.image, 1280)}
-                srcSet={[
-                  `${withParams(feature.image,1280)} 1280w`,
-                  `${withParams(feature.image,1920)} 1920w`,
-                  `${withParams(feature.image,2560)} 2560w`,
-                  `${withParams(feature.image,3840)} 3840w`,
-                ].join(', ')}
-                sizes="(max-width: 640px) 100vw, 360px"
-                alt={feature.alt}
-              />
-            </article>
-          ))}
-        </div>
-        <div className="service-grid">
-          {conciergeHighlights.map((item) => (
-            <article key={item.title} className="service-card">
-              <h3>{item.title}</h3>
-              <p>{item.detail}</p>
-            </article>
-          ))}
+      {/* Value Props Section */}
+      <section className="bg-obsidian py-32 border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-8">
+          <div className="grid md:grid-cols-3 gap-12">
+            {valueProps.map((prop, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.2 }}
+                viewport={{ once: true }}
+                className="group p-8 rounded-3xl bg-obsidian-surface border border-white/5 hover:border-white/20 transition-all duration-500"
+              >
+                <div className={`p-4 rounded-2xl bg-white/5 inline-block mb-8 ${prop.color}`}>
+                  <prop.icon size={32} />
+                </div>
+                <h3 className="text-2xl font-black text-white mb-4 tracking-tight">{prop.title}</h3>
+                <p className="text-slate-400 leading-relaxed text-sm">
+                  {prop.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -224,7 +172,7 @@ export default function Home() {
                 </div>
                 {/* For demo, we use placeholder data since we don't have full property records here */}
                 <PropertyCard property={{
-                  id: rec.property_id,
+                  id: Number(rec.property_id),
                   name: `Residency ${rec.property_id}`,
                   city: 'Bengaluru',
                   state_iso: 'KA',

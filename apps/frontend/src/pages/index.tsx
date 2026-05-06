@@ -7,7 +7,7 @@ export { default as BlogPost } from './BlogPost';
 export { default as Community } from './Community';
 export { default as Contact } from './Contact';
 export { default as Dashboard } from './Dashboard';
-export { default as Dashboards } from './Dashboards';
+export * from './Dashboards';
 export { default as Documents } from './Documents';
 export { default as Gallery } from './Gallery';
 export { default as Locations } from './Locations';

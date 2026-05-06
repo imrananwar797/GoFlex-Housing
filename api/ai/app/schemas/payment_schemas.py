@@ -61,3 +61,9 @@ class RefundResponse(BaseModel):
     amount: float
     status: str
     created_at: datetime
+
+class IssueBillRequest(BaseModel):
+    """Manual bill issuance request"""
+    booking_id: int
+    amount: float = Field(..., gt=0)
+    description: str

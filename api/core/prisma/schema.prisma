@@ -37,10 +37,13 @@ model User {
   reviews      Review[]
   messages     Message[]
   notifications Notification[]
+  subscriptions Subscription[]
+  owned_properties Property[] @relation("OwnerProperties")
 }
 
 model Property {
   id               Int      @id @default(autoincrement())
+  owner_id         Int?     
   name             String
   description      String?
   state_iso        String
@@ -48,12 +51,13 @@ model Property {
   rent             Float
   beds             String
   occupancy        Int      @default(0)
-  active           bool     @default(true)
+  active           Boolean  @default(true)
   cover_image_url  String?
   matterport_url   String?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 
+  owner    User?     @relation("OwnerProperties", fields: [owner_id], references: [id])
   bookings Booking[]
   reviews  Review[]
 }
@@ -151,4 +155,32 @@ model Notification {
   created_at DateTime @default(now())
 
   user User @relation(fields: [user_id], references: [id])
+}
+
+model SubscriptionPlan {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  interval    String   @default("month")
+  features    Json?
+  active      Boolean  @default(true)
+  created_at  DateTime @default(now())
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                     Int      @id @default(autoincrement())
+  user_id                Int
+  plan_id                Int
+  stripe_subscription_id String   @unique
+  status                 String   @default("active")
+  current_period_start   DateTime @default(now())
+  current_period_end     DateTime @default(now())
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+
+  user User             @relation(fields: [user_id], references: [id])
+  plan SubscriptionPlan @relation(fields: [plan_id], references: [id])
 }

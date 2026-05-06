@@ -49,7 +49,7 @@ export default function KYCUpload() {
 
     try {
       setUploading(true);
-      await kycService.uploadDocument(documentType, documentNumber, documentUrl);
+      await kycService.uploadKYC({ document_type: documentType, document_number: documentNumber, document_url: documentUrl });
       setSuccess(true);
       setDocumentType('');
       setDocumentNumber('');

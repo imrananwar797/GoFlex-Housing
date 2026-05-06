@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+// @ts-ignore
 import { authenticator } from 'otplib';
 import qrcode from 'qrcode';
 import crypto from 'crypto';
@@ -13,7 +14,14 @@ export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({ where: { username } });
+    const user = await prisma.user.findFirst({ 
+      where: { 
+        OR: [
+          { username },
+          { email: username }
+        ]
+      } 
+    });
     if (!user) return res.status(401).json({ detail: 'Invalid credentials' });
 
     const isMatch = await bcrypt.compare(password, user.password_hash);

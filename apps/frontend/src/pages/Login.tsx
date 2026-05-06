@@ -25,7 +25,8 @@ export default function Login() {
         setShow2FA(true);
         setTempToken(response.temp_token);
       } else {
-        nav(role === 'admin' ? '/dashboard-admin' : '/dashboard', { replace: true, state: { from: location.state?.from } });
+        const redirectPath = role === 'admin' ? '/dashboard-admin' : role === 'owner' ? '/owner/dashboard' : '/dashboard';
+        nav(redirectPath, { replace: true, state: { from: location.state?.from } });
       }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed');
@@ -40,7 +41,8 @@ export default function Login() {
       // Now login again or update context
       // Note: My AuthContext.login might need update to handle this final step
       // For now, assume it's handled or we reload
-      window.location.href = role === 'admin' ? '/dashboard-admin' : '/dashboard';
+      const redirectPath = role === 'admin' ? '/dashboard-admin' : role === 'owner' ? '/owner/dashboard' : '/dashboard';
+      window.location.href = redirectPath;
     } catch (err: any) {
       setError('Invalid 2FA code');
     }
@@ -78,6 +80,7 @@ export default function Login() {
               <span className="form-label">Login as</span>
               <select className="input" value={role} onChange={(e)=>setRole(e.target.value as Role)}>
                 <option value="resident">Resident</option>
+                <option value="owner">Owner</option>
                 <option value="admin">Admin</option>
               </select>
             </label>

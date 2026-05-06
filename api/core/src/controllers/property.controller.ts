@@ -16,7 +16,7 @@ export const getAllProperties = async (req: Request, res: Response) => {
 export const getPropertyById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const property = await prisma.property.findUnique({ where: { id: parseInt(id) } });
+    const property = await prisma.property.findUnique({ where: { id: parseInt(id as string) } });
     if (!property) return res.status(404).json({ detail: 'Property not found' });
     res.json(property);
   } catch (error) {

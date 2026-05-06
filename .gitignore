@@ -25,6 +25,8 @@ frontend/.vite/
 # IDEs
 .vscode/
 .idea/
+.trae/
+.turbo/
 
 # Build
 dist/
@@ -53,3 +55,24 @@ htmlcov/
 # Temporary files
 *.tmp
 *.bak
+*.swp
+
+# Vite
+*.timestamp-*
+apps/frontend/src/output.css
+
+# Agents & AI
+.agents/
+.gemini/
+.antigravity/
+.brain/
+knowledge/
+implementation_plan.md
+task.md
+walkthrough.md
+scratch/
+
+# Local Binaries & Tools
+*.exe
+*.tar.gz
+supabase/

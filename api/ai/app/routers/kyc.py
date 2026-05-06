@@ -222,7 +222,7 @@ def get_pending_documents(
     current_user: User=Depends(get_current_user)
 ):
     """Get pending KYC documents (Admin only)"""
-    if current_user.role != "admin":
+    if current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Admin access required")
 
     documents = db.query(KycDocument).filter(KycDocument.status == "pending").all()
@@ -238,7 +238,7 @@ def review_kyc_document(
     current_user: User=Depends(get_current_user)
 ):
     """Review KYC document (Admin only)"""
-    if current_user.role != "admin":
+    if current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Admin access required")
 
     if status not in ["approved", "rejected"]:

@@ -10,6 +10,9 @@ import aiRoutes from './routes/ai.routes';
 import kycRoutes from './routes/kyc.routes';
 import escrowRoutes from './routes/escrow.routes';
 import referralRoutes from './routes/referral.routes';
+import blogRoutes from './routes/blog.routes';
+import subscriptionRoutes from './routes/subscription.routes';
+import ownerRoutes from './routes/owner.routes';
 
 dotenv.config();
 
@@ -32,6 +35,9 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/kyc', kycRoutes);
 app.use('/api/escrow', escrowRoutes);
 app.use('/api/referrals', referralRoutes);
+app.use('/api/blog', blogRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/owner', ownerRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'GoFlex Core' });

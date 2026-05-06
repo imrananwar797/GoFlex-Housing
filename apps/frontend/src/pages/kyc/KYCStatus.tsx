@@ -20,8 +20,8 @@ export default function KYCStatus() {
         kycService.getKYCStatus(),
         kycService.getDocuments(),
       ]);
-      setStatus(statusResult.data);
-      setDocuments(docsResult.data);
+      setStatus(statusResult);
+      setDocuments(docsResult || []);
     } catch (err) {
       setError('Failed to load KYC information');
       console.error(err);
@@ -64,7 +64,7 @@ export default function KYCStatus() {
     );
   }
 
-  const progress = status ? getProgressPercentage(status.level) : 0;
+  const progress = status ? getProgressPercentage(status.level || 'basic') : 0;
 
   return (
     <section className="content-wrap dashboard-page">
@@ -80,8 +80,8 @@ export default function KYCStatus() {
           <div className="kyc-status-card">
             <div className="status-header">
               <h2>Verification Status</h2>
-              <span className={`level-badge level-${getLevelColor(status.level)}`}>
-                {status.level.toUpperCase()}
+              <span className={`level-badge level-${getLevelColor(status.level || 'basic')}`}>
+                {(status.level || 'basic').toUpperCase()}
               </span>
             </div>
 
@@ -113,10 +113,10 @@ export default function KYCStatus() {
                 )}
               </div>
 
-              <div className={`check-item ${status.documentsApproved?.length > 0 ? 'completed' : 'pending'}`}>
-                <span className="check-icon">{status.documentsApproved?.length > 0 ? '✓' : '○'}</span>
+              <div className={`check-item ${(status.documentsApproved?.length || 0) > 0 ? 'completed' : 'pending'}`}>
+                <span className="check-icon">{(status.documentsApproved?.length || 0) > 0 ? '✓' : '○'}</span>
                 <span className="check-label">Documents Approved</span>
-                {!status.documentsApproved?.length && (
+                {!(status.documentsApproved?.length) && (
                   <NavLink to="/kyc/upload" className="check-action">
                     Upload Documents
                   </NavLink>
