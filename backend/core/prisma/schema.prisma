@@ -39,6 +39,7 @@ model User {
   notifications Notification[]
   subscriptions Subscription[]
   owned_properties Property[] @relation("OwnerProperties")
+  blog_posts    BlogPost[]
 }
 
 model Property {
@@ -183,4 +184,20 @@ model Subscription {
 
   user User             @relation(fields: [user_id], references: [id])
   plan SubscriptionPlan @relation(fields: [plan_id], references: [id])
+}
+
+model BlogPost {
+  id           Int      @id @default(autoincrement())
+  title        String
+  slug         String   @unique
+  excerpt      String
+  content      String   @db.Text
+  featured_image String?
+  category     String
+  tags         String[]
+  view_count   Int      @default(0)
+  published_at DateTime @default(now())
+  author_id    Int
+  
+  author       User     @relation(fields: [author_id], references: [id])
 }
