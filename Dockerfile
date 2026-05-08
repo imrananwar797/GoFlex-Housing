@@ -24,5 +24,9 @@ RUN npm run build
 FROM nginx:alpine
 # Note: In a monorepo, build output might be in apps/frontend/dist
 COPY --from=build /app/apps/frontend/dist /usr/share/nginx/html
-EXPOSE 80
+
+# Configure Nginx to listen on port 8000 (matching Render's expectation)
+RUN sed -i 's/listen  80;/listen 8000;/g' /etc/nginx/conf.d/default.conf
+
+EXPOSE 8000
 CMD ["nginx", "-g", "daemon off;"]
