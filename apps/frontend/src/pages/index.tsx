@@ -17,3 +17,4 @@ export { default as Register } from './Register';
 export { default as Terms } from './Terms';
 export { default as Settings } from './Settings';
 export { default as PropertyDetail } from './PropertyDetail';
+export { default as Team } from './Team';

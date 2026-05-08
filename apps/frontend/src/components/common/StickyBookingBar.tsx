@@ -8,7 +8,7 @@ export default function StickyBookingBar() {
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 1, duration: 0.8 }}
-      className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[90%] max-w-5xl z-30"
+      className="w-full max-w-5xl px-4"
     >
       <div className="bg-[#0B0E14]/80 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl p-2 sm:p-4 flex flex-col md:flex-row items-center gap-4">
         {/* Location */}

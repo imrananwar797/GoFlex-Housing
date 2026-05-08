@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import morgan from 'morgan';
 import dotenv from 'dotenv';
 import http from 'http';
 import authRoutes from './routes/auth.routes';
@@ -24,6 +25,7 @@ app.use(cors({
   origin: true, // Reflect request origin in production
   credentials: true
 }));
+app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
@@ -49,5 +51,14 @@ if (process.env.NODE_ENV !== 'production') {
     console.log(`Node.js Core Backend running on port ${PORT}`);
   });
 }
+
+// Global Error Handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('❌ Backend Error:', err);
+  res.status(err.status || 500).json({
+    detail: err.message || 'Internal server error',
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
 
 export default app;

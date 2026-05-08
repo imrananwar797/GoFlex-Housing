@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { Home, Placeholder } from './pages';
+import { Home, Placeholder, Team } from './pages';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import RequireAuth from './components/auth/RequireAuth';
 import { UserDashboard } from './pages/Dashboards';
@@ -231,6 +231,7 @@ export default function App() {
               <Route path="/documents" element={<Documents />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/team" element={<Team />} />
 
               {/* Resident Routes */}
               <Route path="/dashboard" element={<RequireAuth role="resident"><UserDashboard /></RequireAuth>} />
