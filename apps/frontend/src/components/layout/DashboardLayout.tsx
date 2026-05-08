@@ -37,10 +37,13 @@ export default function DashboardLayout({
   }, [location]);
 
   const defaultNav = user?.role?.toLowerCase() === 'owner' ? [
+    { to: '/', label: 'Home', icon: Home },
     { to: '/owner/dashboard', label: 'Overview', icon: LayoutDashboard },
     { to: '/owner/properties', label: 'My Properties', icon: ShieldCheck },
     { to: '/owner/residents', label: 'Residents', icon: Users },
     { to: '/owner/revenue', label: 'Revenue', icon: Receipt },
+    { to: '/amenities', label: 'Amenities', icon: Sparkles },
+    { to: '/blog', label: 'Blog', icon: BookOpen },
   ] : [
     { to: '/', label: 'Home', icon: Home },
     { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
