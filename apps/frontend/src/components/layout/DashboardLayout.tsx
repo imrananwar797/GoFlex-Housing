@@ -10,7 +10,10 @@ import {
   X,
   Bell,
   LogOut,
-  Settings
+  Settings,
+  Home,
+  Sparkles,
+  BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 
@@ -39,7 +42,10 @@ export default function DashboardLayout({
     { to: '/owner/residents', label: 'Residents', icon: Users },
     { to: '/owner/revenue', label: 'Revenue', icon: Receipt },
   ] : [
+    { to: '/', label: 'Home', icon: Home },
     { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+    { to: '/amenities', label: 'Amenities', icon: Sparkles },
+    { to: '/blog', label: 'Blog', icon: BookOpen },
     { to: '/kyc/status', label: 'AI Verify', icon: ShieldCheck },
     { to: '/subscriptions/plans', label: 'Billing', icon: Receipt },
     { to: '/community', label: 'Community', icon: Users },
