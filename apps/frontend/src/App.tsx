@@ -6,7 +6,7 @@ import { Home, Placeholder, Team } from './pages';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import RequireAuth from './components/auth/RequireAuth';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import NavAuthActions from './components/layout/NavAuthActions';
+import AIConcierge from './components/ai/AIConcierge';
 import { UserDashboard } from './pages/Dashboards';
 import ScrollTop from './components/common/ScrollTop';
 import HelpFab from './components/common/HelpFab';
@@ -26,8 +26,31 @@ const Locations = React.lazy(() => import('./pages/Locations'));
 const Contact = React.lazy(() => import('./pages/Contact'));
 
 const OwnerDashboard = React.lazy(() => import('./pages/owner/OwnerDashboard'));
+const OwnerProperties = React.lazy(() => import('./pages/owner/OwnerProperties'));
+const OwnerResidents = React.lazy(() => import('./pages/owner/OwnerResidents'));
+const OwnerRevenue = React.lazy(() => import('./pages/owner/OwnerRevenue'));
+const OwnerPropertyDetail = React.lazy(() => import('./pages/owner/OwnerPropertyDetail'));
+const OwnerPropertyBookings = React.lazy(() => import('./pages/owner/OwnerPropertyBookings'));
+const OwnerPropertyRevenue = React.lazy(() => import('./pages/owner/OwnerPropertyRevenue'));
+const OwnerPropertyReviews = React.lazy(() => import('./pages/owner/OwnerPropertyReviews'));
+
 const AdminOverview = React.lazy(() => import('./pages/admin/AdminOverview'));
+const AdminUsers = React.lazy(() => import('./pages/admin/AdminUsers'));
+const AdminProperties = React.lazy(() => import('./pages/admin/AdminProperties'));
+const AdminBookings = React.lazy(() => import('./pages/admin/AdminBookings'));
+const AdminFraudAlerts = React.lazy(() => import('./pages/admin/AdminFraudAlerts'));
+
+const KYCStatus = React.lazy(() => import('./pages/kyc/KYCStatus'));
+const KYCUpload = React.lazy(() => import('./pages/kyc/KYCUpload'));
+const KYCVerify = React.lazy(() => import('./pages/kyc/KYCVerify'));
+
+const SubscriptionPlans = React.lazy(() => import('./pages/subscriptions/SubscriptionPlans'));
+const SubscriptionCurrent = React.lazy(() => import('./pages/subscriptions/SubscriptionCurrent'));
+const SubscriptionHistory = React.lazy(() => import('./pages/subscriptions/SubscriptionHistory'));
+
+const Referrals = React.lazy(() => import('./pages/Referrals'));
 const Settings = React.lazy(() => import('./pages/Settings'));
+const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 
 function NotFound() {
   return (
@@ -263,6 +286,12 @@ export default function App() {
                   {/* Owner Routes */}
                   <Route path="/owner/dashboard" element={<RequireAuth role="owner"><OwnerDashboard /></RequireAuth>} />
                   <Route path="/owner/properties" element={<RequireAuth role="owner"><OwnerProperties /></RequireAuth>} />
+                  <Route path="/owner/residents" element={<RequireAuth role="owner"><OwnerResidents /></RequireAuth>} />
+                  <Route path="/owner/revenue" element={<RequireAuth role="owner"><OwnerRevenue /></RequireAuth>} />
+                  <Route path="/owner/properties/:id" element={<RequireAuth role="owner"><OwnerPropertyDetail /></RequireAuth>} />
+                  <Route path="/owner/properties/:id/bookings" element={<RequireAuth role="owner"><OwnerPropertyBookings /></RequireAuth>} />
+                  <Route path="/owner/properties/:id/revenue" element={<RequireAuth role="owner"><OwnerPropertyRevenue /></RequireAuth>} />
+                  <Route path="/owner/properties/:id/reviews" element={<RequireAuth role="owner"><OwnerPropertyReviews /></RequireAuth>} />
 
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
@@ -279,12 +308,25 @@ export default function App() {
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/team" element={<Team />} />
 
-                  {/* Resident Routes */}
+                  {/* Resident/KYC/Subscription Routes */}
                   <Route path="/dashboard" element={<RequireAuth role="resident"><UserDashboard /></RequireAuth>} />
                   <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+                  <Route path="/referrals" element={<RequireAuth role="resident"><Referrals /></RequireAuth>} />
+                  
+                  <Route path="/kyc/status" element={<RequireAuth role="resident"><KYCStatus /></RequireAuth>} />
+                  <Route path="/kyc/upload" element={<RequireAuth role="resident"><KYCUpload /></RequireAuth>} />
+                  <Route path="/kyc/verify" element={<RequireAuth role="resident"><KYCVerify /></RequireAuth>} />
+
+                  <Route path="/subscriptions/plans" element={<RequireAuth role="resident"><SubscriptionPlans /></RequireAuth>} />
+                  <Route path="/subscriptions/current" element={<RequireAuth role="resident"><SubscriptionCurrent /></RequireAuth>} />
+                  <Route path="/subscriptions/history" element={<RequireAuth role="resident"><SubscriptionHistory /></RequireAuth>} />
                   
                   {/* Admin Routes */}
                   <Route path="/admin/dashboard" element={<RequireAuth role="admin"><AdminOverview /></RequireAuth>} />
+                  <Route path="/admin/users" element={<RequireAuth role="admin"><AdminUsers /></RequireAuth>} />
+                  <Route path="/admin/properties" element={<RequireAuth role="admin"><AdminProperties /></RequireAuth>} />
+                  <Route path="/admin/bookings" element={<RequireAuth role="admin"><AdminBookings /></RequireAuth>} />
+                  <Route path="/admin/fraud" element={<RequireAuth role="admin"><AdminFraudAlerts /></RequireAuth>} />
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
@@ -293,6 +335,7 @@ export default function App() {
           </main>
           {!isDashboard && <ScrollTop />}
           {!isDashboard && <HelpFab />}
+          <AIConcierge />
           {!isDashboard && (
             <footer className="site-footer">
               <div className="footer-inner">

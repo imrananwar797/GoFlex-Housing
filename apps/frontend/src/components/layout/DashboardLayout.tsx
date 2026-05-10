@@ -16,6 +16,8 @@ import {
   BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
+import NotificationPanel from './NotificationPanel';
+import UserProfilePanel from './UserProfilePanel';
 
 export default function DashboardLayout({ 
   title, 
@@ -30,6 +32,11 @@ export default function DashboardLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
+  const [activePanel, setActivePanel] = useState<'notifications' | 'profile' | null>(null);
+
+  const togglePanel = (panel: 'notifications' | 'profile') => {
+    setActivePanel(activePanel === panel ? null : panel);
+  };
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -151,24 +158,42 @@ export default function DashboardLayout({
             <h1 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] lg:tracking-[0.5em] truncate max-w-[150px] lg:max-w-none">{title}</h1>
           </div>
           
-          <div className="flex items-center gap-2 lg:gap-4">
-            <button className="relative p-2 text-slate-500 hover:text-white transition-colors">
+          <div className="flex items-center gap-2 lg:gap-4 relative">
+            <button 
+              onClick={() => togglePanel('notifications')}
+              className={`relative p-2 transition-colors ${activePanel === 'notifications' ? 'text-white bg-white/5 rounded-xl' : 'text-slate-500 hover:text-white'}`}
+            >
               <Bell size={20} />
               <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-neon-red rounded-full shadow-[0_0_8px_#FF3131]" />
             </button>
             
-            <div className="flex items-center gap-3 pl-2 lg:pl-4 border-l border-white/10">
-              <div className="text-right hidden sm:block">
+            <AnimatePresence>
+              {activePanel === 'notifications' && (
+                <NotificationPanel onClose={() => setActivePanel(null)} />
+              )}
+            </AnimatePresence>
+            
+            <div className="flex items-center gap-3 pl-2 lg:pl-4 border-l border-white/10 relative">
+              <div className="text-right hidden sm:block cursor-pointer" onClick={() => togglePanel('profile')}>
                 <p className="text-xs font-black text-white uppercase tracking-tight truncate max-w-[100px]">{user?.full_name || user?.username}</p>
                 <p className="text-[9px] text-neon-green font-black uppercase tracking-widest leading-none mt-1">
                   {user?.role || 'Resident'}
                 </p>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon-blue via-purple-500 to-neon-red p-[1px] shrink-0">
+              <div 
+                onClick={() => togglePanel('profile')}
+                className="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon-blue via-purple-500 to-neon-red p-[1px] shrink-0 cursor-pointer hover:scale-105 transition-transform"
+              >
                 <div className="w-full h-full rounded-[11px] bg-[#0B0E14] flex items-center justify-center font-black text-xs text-white">
                   {user?.username?.[0].toUpperCase()}
                 </div>
               </div>
+
+              <AnimatePresence>
+                {activePanel === 'profile' && (
+                  <UserProfilePanel onClose={() => setActivePanel(null)} />
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </header>

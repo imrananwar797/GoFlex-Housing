@@ -5,7 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 import { securityService } from '../services/security.service';
 import type { Role } from '../services/auth.service';
 import PageTransition from '../components/common/PageTransition';
-import { LogIn, ShieldCheck, User, Lock, ArrowRight } from 'lucide-react';
+import { LogIn, ShieldCheck, User, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const { login } = useAuth();
@@ -19,6 +19,7 @@ export default function Login() {
   const [show2FA, setShow2FA] = useState(false);
   const [otp, setOtp] = useState('');
   const [tempToken, setTempToken] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +31,7 @@ export default function Login() {
         setShow2FA(true);
         setTempToken(response.temp_token);
       } else {
-        const redirectPath = role === 'admin' ? '/admin/dashboard' : role === 'owner' ? '/owner/dashboard' : '/dashboard';
+        const redirectPath = role === 'owner' ? '/owner/dashboard' : '/dashboard';
         nav(redirectPath, { replace: true, state: { from: location.state?.from } });
       }
     } catch (err: any) {
@@ -46,7 +47,7 @@ export default function Login() {
     setLoading(true);
     try {
       await securityService.validateLogin2FA(otp, tempToken);
-      const redirectPath = role === 'admin' ? '/admin/dashboard' : role === 'owner' ? '/owner/dashboard' : '/dashboard';
+      const redirectPath = role === 'owner' ? '/owner/dashboard' : '/dashboard';
       window.location.href = redirectPath;
     } catch (err: any) {
       setError('Invalid 2FA code');
@@ -149,13 +150,20 @@ export default function Login() {
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
                     <input 
-                      className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white focus:outline-none focus:border-neon-blue/50 focus:ring-1 focus:ring-neon-blue/20 transition-all"
-                      type="password" 
+                      className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-12 py-4 text-white focus:outline-none focus:border-neon-blue/50 focus:ring-1 focus:ring-neon-blue/20 transition-all"
+                      type={showPassword ? 'text' : 'password'} 
                       placeholder="••••••••"
                       value={password} 
                       onChange={(e)=>setPassword(e.target.value)} 
                       required 
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
                 </div>
 
@@ -168,7 +176,6 @@ export default function Login() {
                   >
                     <option value="resident" className="bg-obsidian">Resident</option>
                     <option value="owner" className="bg-obsidian">Owner</option>
-                    <option value="admin" className="bg-obsidian">Admin</option>
                   </select>
                 </div>
 

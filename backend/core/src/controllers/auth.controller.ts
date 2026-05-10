@@ -8,29 +8,36 @@ import qrcode from 'qrcode';
 import crypto from 'crypto';
 import prisma from '../utils/db.client';
 
+const SECRET_KEY = process.env.JWT_SECRET;
+if (!SECRET_KEY) {
+  throw new Error('FATAL: JWT_SECRET environment variable not set.');
+}
+
 // const prisma = new PrismaClient();
 
 export const login = async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   try {
-    const user = await prisma.user.findFirst({ 
-      where: { 
-        OR: [
-          { username },
-          { email: username }
-        ]
-      } 
+    console.log(`[DEBUG] Login attempt for: ${username}`);
+    const user = await prisma.user.findFirst({
+      where: { OR: [{ email: username }, { username: username }] }
     });
-    if (!user) return res.status(401).json({ detail: 'Invalid credentials' });
+
+    if (!user) {
+      console.log(`[DEBUG] User not found: ${username}`);
+      return res.status(401).json({ detail: 'Invalid credentials' });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password_hash);
+    console.log(`[DEBUG] Password match: ${isMatch}`);
+    
     if (!isMatch) return res.status(401).json({ detail: 'Invalid credentials' });
 
     if (user.two_factor_enabled) {
       const tempToken = jwt.sign(
         { sub: user.username, user_id: user.id, role: user.role, scope: '2fa_pending' },
-        process.env.SECRET_KEY || 'secret',
+        SECRET_KEY,
         { expiresIn: '5m' }
       );
       return res.json({ requires_2fa: true, temp_token: tempToken });
@@ -38,7 +45,7 @@ export const login = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { sub: user.username, user_id: user.id, role: user.role },
-      process.env.SECRET_KEY || 'secret',
+      SECRET_KEY,
       { expiresIn: '24h' }
     );
 
@@ -79,7 +86,7 @@ export const register = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { sub: user.username, user_id: user.id, role: user.role },
-      process.env.SECRET_KEY || 'secret',
+      SECRET_KEY,
       { expiresIn: '24h' }
     );
 
@@ -100,7 +107,7 @@ export const validate2FA = async (req: Request, res: Response) => {
   const { code, temp_token } = req.body;
 
   try {
-    const payload: any = jwt.verify(temp_token, process.env.SECRET_KEY || 'secret');
+    const payload: any = jwt.verify(temp_token, SECRET_KEY);
     if (payload.scope !== '2fa_pending') throw new Error();
 
     const user = await prisma.user.findUnique({ where: { id: payload.user_id } });
@@ -111,7 +118,7 @@ export const validate2FA = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       { sub: user.username, user_id: user.id, role: user.role },
-      process.env.SECRET_KEY || 'secret',
+      SECRET_KEY,
       { expiresIn: '24h' }
     );
 

@@ -1,77 +1,77 @@
--- Properties core data
+-- Users table
+create table if not exists public.users (
+  id serial primary key,
+  username text not null unique,
+  email text not null unique,
+  full_name text,
+  phone text,
+  hashed_password text not null,
+  role text not null default 'RESIDENT',
+  referral_code text unique,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Properties table
 create table if not exists public.properties (
-  id uuid primary key default gen_random_uuid(),
+  id serial primary key,
+  owner_id integer references public.users(id),
   name text not null,
   slug text not null unique,
-  state_iso text not null,
   city text not null,
+  state text,
   address text,
-  rent integer not null,
-  beds text not null check (beds in ('Single','Double','Triple')),
-  occupancy integer not null default 0,
-  rating numeric(2,1),
-  cover_image_url text not null,
-  inserted_at timestamptz not null default now()
+  monthly_price numeric(10,2) not null,
+  occupancy numeric(5,2) default 0,
+  amenities jsonb,
+  featured_image text,
+  verified boolean default false,
+  active boolean default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
--- Property gallery photos
-create table if not exists public.property_photos (
-  id bigserial primary key,
-  property_id uuid not null references public.properties(id) on delete cascade,
-  image_url text not null,
-  alt text,
-  inserted_at timestamptz not null default now()
+-- Bookings table
+create table if not exists public.bookings (
+  id serial primary key,
+  property_id integer references public.properties(id),
+  resident_id integer references public.users(id),
+  check_in_date timestamptz not null,
+  check_out_date timestamptz not null,
+  total_amount numeric(10,2) not null,
+  status text default 'pending',
+  payment_status text default 'pending',
+  created_at timestamptz default now()
 );
 
--- Resident testimonials
-create table if not exists public.testimonials (
-  id bigserial primary key,
-  resident_name text not null,
-  quote text not null,
-  avatar_url text,
-  city text,
-  inserted_at timestamptz not null default now()
+-- Escrow Accounts table
+create table if not exists public.escrow_accounts (
+  id serial primary key,
+  booking_id integer unique references public.bookings(id),
+  user_id integer references public.users(id),
+  amount_held numeric(10,2) not null,
+  status text default 'active',
+  release_date timestamptz,
+  created_at timestamptz default now()
 );
 
--- Frequently asked questions
-create table if not exists public.faqs (
-  id bigserial primary key,
-  question text not null,
-  answer text not null,
-  category text,
-  inserted_at timestamptz not null default now()
+-- KYC Documents table
+create table if not exists public.kyc_documents (
+  id serial primary key,
+  user_id integer unique references public.users(id),
+  document_type text not null,
+  file_path text not null,
+  status text default 'pending',
+  created_at timestamptz default now()
 );
 
--- Enable Row Level Security so policies can be added later
+-- Enable RLS
+alter table public.users enable row level security;
 alter table public.properties enable row level security;
-alter table public.property_photos enable row level security;
-alter table public.testimonials enable row level security;
-alter table public.faqs enable row level security;
+alter table public.bookings enable row level security;
+alter table public.escrow_accounts enable row level security;
+alter table public.kyc_documents enable row level security;
 
--- Sample seed data ---------------------------------------------------------
-insert into public.properties (id, name, slug, state_iso, city, address, rent, beds, occupancy, rating, cover_image_url)
-values
-  ('54e20f54-c1a2-4c0d-9a06-135495b7a2c1','Sky Deck Residency','sky-deck-residency','KA','Bengaluru','12 Skyview Road, Indiranagar',14000,'Double',92,4.8,'https://images.pexels.com/photos/7651627/pexels-photo-7651627.jpeg'),
-  ('4c47639f-8744-4f73-a14e-41901df08d16','Riverview House','riverview-house','MH','Mumbai','221 Riverside Lane, Bandra East',18500,'Single',88,4.9,'https://images.pexels.com/photos/4874580/pexels-photo-4874580.jpeg'),
-  ('a9d8a2bc-89dc-4568-bbd8-9a808f260299','Green Court','green-court','DL','New Delhi','8 Residency Park, Saket',12500,'Triple',76,4.6,'https://images.pexels.com/photos/32982365/pexels-photo-32982365.jpeg'),
-  ('01c57c8c-0a28-446d-8bf8-dc644a8f0f4b','Harbour Suites','harbour-suites','GA','Panaji','44 Pearl Bay, Dona Paula',16500,'Double',81,4.7,'https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg')
-on conflict (id) do update set name = excluded.name;
-
-insert into public.property_photos (property_id, image_url, alt)
-values
-  ('54e20f54-c1a2-4c0d-9a06-135495b7a2c1','https://images.pexels.com/photos/4907205/pexels-photo-4907205.jpeg','Modern hostel bunk beds'),
-  ('4c47639f-8744-4f73-a14e-41901df08d16','https://images.pexels.com/photos/6489127/pexels-photo-6489127.jpeg','Sleek shared kitchen'),
-  ('4c47639f-8744-4f73-a14e-41901df08d16','https://images.pexels.com/photos/4874580/pexels-photo-4874580.jpeg','Apartment building facade'),
-  ('a9d8a2bc-89dc-4568-bbd8-9a808f260299','https://images.pexels.com/photos/7651627/pexels-photo-7651627.jpeg','Coworking lounge'),
-  ('01c57c8c-0a28-446d-8bf8-dc644a8f0f4b','https://images.pexels.com/photos/32982365/pexels-photo-32982365.jpeg','Student housing exterior');
-
-insert into public.testimonials (resident_name, quote, avatar_url, city)
-values
-  ('Priya','“A welcoming community with great shared spaces. Feels like home.”','https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg','Bengaluru'),
-  ('Arjun','“Clean rooms, friendly staff, and hassle-free living.”','https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg','Pune');
-
-insert into public.faqs (question, answer, category)
-values
-  ('How do I book a room?','Choose a property, fill the form, and our team will call to confirm your visit and booking.',null),
-  ('Is food included?','Food-inclusive plans are available at select properties; details vary by location.',null),
-  ('What is the minimum stay?','Typically 3 months; policies can vary by property.',null);
+-- Basic Policies (To be refined)
+create policy "Public properties are viewable by everyone" on public.properties for select using (true);
+create policy "Users can see their own data" on public.users for select using (auth.uid()::text = id::text);

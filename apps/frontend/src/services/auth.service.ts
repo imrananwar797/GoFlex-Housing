@@ -9,6 +9,7 @@ export interface AuthUser {
   role: Role;
   token?: string;
   full_name?: string;
+  phone?: string;
 }
 
 export interface LoginResponse {

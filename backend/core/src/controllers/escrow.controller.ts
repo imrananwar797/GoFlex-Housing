@@ -1,6 +1,29 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/db.client';
 
+export const getEscrowAccount = async (req: Request, res: Response) => {
+  const { booking_id } = req.params;
+  try {
+    const account = await prisma.escrowAccount.findUnique({
+      where: { booking_id: parseInt(booking_id) },
+      include: { booking: true }
+    });
+
+    if (!account) {
+      return res.status(404).json({ detail: 'Escrow account not found' });
+    }
+
+    res.json({
+      ...account,
+      settlement_layer: 'Polygon Mainnet (Simulated)',
+      verification_hash: `0x${Math.random().toString(16).slice(2, 42)}`, // Simulated hash
+      status_message: 'Funds secured in smart contract'
+    });
+  } catch (error) {
+    res.status(500).json({ detail: 'Error fetching escrow data' });
+  }
+};
+
 export const getEscrowStatus = async (req: Request, res: Response) => {
   const user_id = (req as any).user.user_id;
 
