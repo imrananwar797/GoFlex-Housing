@@ -46,7 +46,7 @@ export default function OwnerDashboard() {
         {/* Main Intelligence Grid */}
         <div className="grid grid-cols-12 gap-8">
           {/* Revenue Ledger Card */}
-          <div className="col-span-12 lg:col-span-8 bg-[#080A0E]/60 backdrop-blur-2xl border border-white/10 rounded-[40px] p-10 relative overflow-hidden group">
+          <div className="col-span-12 lg:col-span-8 bg-[#080A0E]/60 backdrop-blur-xl border border-white/10 rounded-[40px] p-10 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             
             {/* Border Beam Animation */}
@@ -91,7 +91,7 @@ export default function OwnerDashboard() {
           </div>
 
           {/* Visionary Collective Module (Resident Management) */}
-          <div className="col-span-12 bg-[#080A0E]/60 backdrop-blur-2xl border border-white/10 rounded-[40px] p-10">
+          <div className="col-span-12 bg-[#080A0E]/60 backdrop-blur-xl border border-white/10 rounded-[40px] p-10">
             <div className="flex justify-between items-center mb-10">
               <div>
                 <h3 className="text-white text-2xl font-black mb-1">Visionary Collective</h3>

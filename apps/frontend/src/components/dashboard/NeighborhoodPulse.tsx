@@ -11,7 +11,7 @@ const PULSE_EVENTS = [
 
 export default function NeighborhoodPulse() {
   return (
-    <div className="bg-obsidian-surface/60 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 h-full">
+    <div className="bg-obsidian-surface/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 h-full">
       <div className="flex justify-between items-center mb-8">
         <div>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Neighborhood Pulse</p>

@@ -4,7 +4,7 @@ import { fetchGalleryPhotos } from '../../services/content.service';
 
 function withParams(src: string, w: number) {
   const join = src.includes('?') ? '&' : '?';
-  return `${src}${join}auto=compress&cs=tinysrgb&w=${w}&dpr=1`;
+  return `${src}${join}auto=format,compress&q=80&w=${w}&dpr=1`;
 }
 
 export default function AutoGallery() {
@@ -46,12 +46,12 @@ export default function AutoGallery() {
               loading="lazy"
               decoding="async"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              src={withParams(photo.image_url, 1280)}
+              src={withParams(photo.image_url, 800)}
               srcSet={[
-                `${withParams(photo.image_url,1280)} 1280w`,
-                `${withParams(photo.image_url,1920)} 1920w`,
-                `${withParams(photo.image_url,2560)} 2560w`,
-                `${withParams(photo.image_url,3840)} 3840w`,
+                `${withParams(photo.image_url, 800)} 800w`,
+                `${withParams(photo.image_url, 1280)} 1280w`,
+                `${withParams(photo.image_url, 1920)} 1920w`,
+                `${withParams(photo.image_url, 2560)} 2560w`,
               ].join(', ')}
               sizes="(max-width: 640px) 80vw, (max-width: 1100px) 40vw, 33vw"
               alt={photo.alt || 'Coliving space'}

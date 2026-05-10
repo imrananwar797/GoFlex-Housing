@@ -44,7 +44,7 @@ const ReferralCenter: React.FC = () => {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#080A0E]/60 backdrop-blur-2xl border border-white/5 rounded-[32px] p-8 relative overflow-hidden"
+        className="bg-[#080A0E]/60 backdrop-blur-xl border border-white/5 rounded-[32px] p-8 relative overflow-hidden"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-neon-blue/5 blur-3xl -mr-32 -mt-32" />
         

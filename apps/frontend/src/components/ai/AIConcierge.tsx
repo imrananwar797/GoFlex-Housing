@@ -91,7 +91,7 @@ export default function AIConcierge() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="w-80 sm:w-96 h-[500px] bg-[#080A0E]/95 backdrop-blur-2xl border border-neon-blue/20 rounded-[32px] shadow-2xl flex flex-col overflow-hidden"
+            className="w-80 sm:w-96 h-[500px] bg-[#080A0E]/95 backdrop-blur-xl border border-neon-blue/20 rounded-[32px] shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="p-6 bg-gradient-to-r from-neon-blue/10 to-purple-500/10 border-b border-white/5 flex items-center justify-between">

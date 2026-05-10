@@ -37,7 +37,7 @@ export default function OwnerAnalyticsHUD() {
       </div>
 
       {/* Predictive Health Forecast */}
-      <div className="bg-obsidian-surface/60 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden">
+      <div className="bg-obsidian-surface/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden">
         <div className="flex justify-between items-start mb-8">
           <div>
             <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Preventative Care</p>
@@ -71,7 +71,7 @@ export default function OwnerAnalyticsHUD() {
       </div>
 
       {/* Resident Trust Radar */}
-      <div className="bg-obsidian-surface/60 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden">
+      <div className="bg-obsidian-surface/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden">
         <div className="flex justify-between items-start mb-8">
           <div>
             <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Sync Integrity</p>

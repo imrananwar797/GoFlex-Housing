@@ -10,7 +10,7 @@ export default function StickyBookingBar() {
       transition={{ delay: 1, duration: 0.8 }}
       className="w-full max-w-5xl px-4"
     >
-      <div className="bg-[#0B0E14]/80 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl p-2 sm:p-4 flex flex-col md:flex-row items-center gap-4">
+      <div className="bg-[#0B0E14]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-2 sm:p-4 flex flex-col md:flex-row items-center gap-4">
         {/* Location */}
         <div className="flex-1 w-full group cursor-pointer px-4 py-2 rounded-xl hover:bg-white/5 transition-colors">
           <div className="flex items-center gap-3 text-slate-400 group-hover:text-neon-blue transition-colors">

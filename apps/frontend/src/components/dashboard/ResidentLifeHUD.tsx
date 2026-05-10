@@ -24,7 +24,7 @@ export default function ResidentLifeHUD() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Biometric Circadian Widget */}
-      <div className="bg-obsidian-surface/60 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
+      <div className="bg-obsidian-surface/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-32 h-32 bg-neon-blue/5 blur-3xl -mr-16 -mt-16" />
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -60,7 +60,7 @@ export default function ResidentLifeHUD() {
       </div>
 
       {/* Neural Bandwidth HUD */}
-      <div className="bg-obsidian-surface/60 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
+      <div className="bg-obsidian-surface/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
         <div className="flex justify-between items-start mb-8">
           <div>
             <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-2">Neural Bandwidth</p>

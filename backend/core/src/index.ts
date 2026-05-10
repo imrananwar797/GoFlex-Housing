@@ -64,7 +64,11 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/referrals', referralRoutes);
 app.use('/api/ai', aiRoutes);
 
-app.get('/api/v1/network/stats', async (req, res) => {
+let cachedStats: any = null;
+let lastFetch = 0;
+const CACHE_TTL = 300 * 1000; // 5 minutes
+
+const refreshStats = async () => {
   try {
     const [nodeCount, residentCount, occupancySum] = await Promise.all([
       prisma.property.count({ where: { active: true } }),
@@ -72,16 +76,39 @@ app.get('/api/v1/network/stats', async (req, res) => {
       prisma.property.aggregate({ _sum: { occupancy: true } })
     ]);
 
-    res.json({
+    cachedStats = {
       active_nodes: nodeCount || 0,
       total_residents: residentCount || 0,
-      energy_saved_kwh: Math.floor((occupancySum._sum.occupancy || 0) * 12.5), // Simulated energy saving based on occupancy
+      energy_saved_kwh: Math.floor((occupancySum._sum.occupancy || 0) * 12.5),
       network_trust_score: 94.2,
       timestamp: new Date().toISOString()
-    });
+    };
+    lastFetch = Date.now();
   } catch (error) {
-    res.status(500).json({ detail: 'Failed to fetch network telemetry' });
+    console.error('Failed to refresh stats:', error);
   }
+};
+
+// Initial fetch
+refreshStats();
+
+app.get('/api/v1/network/stats', async (req, res) => {
+  const now = Date.now();
+  
+  // Serve cache if exists, regardless of age
+  if (cachedStats) {
+    res.json({ ...cachedStats, source: 'cache' });
+    
+    // Background refresh if expired
+    if (now - lastFetch > CACHE_TTL) {
+      refreshStats();
+    }
+    return;
+  }
+
+  // If no cache, perform blocking fetch (first time only)
+  await refreshStats();
+  res.json(cachedStats || { detail: 'Service warming up' });
 });
 
 app.get('/health', async (req, res) => {

@@ -4,7 +4,7 @@ import { Wallet, TrendingUp, Link } from 'lucide-react';
 
 export default function EscrowYieldSnapshot() {
   return (
-    <div className="bg-obsidian-surface/60 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
+    <div className="bg-obsidian-surface/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden group">
       <div className="flex justify-between items-start mb-10">
         <div>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Web3 Settlement</p>

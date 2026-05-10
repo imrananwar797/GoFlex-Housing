@@ -6,7 +6,7 @@ export default function CarbonTrace() {
   const score = 92; // Simulated resident score
   
   return (
-    <div className="bg-obsidian-surface/60 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden h-full group">
+    <div className="bg-obsidian-surface/60 backdrop-blur-xl border border-white/10 rounded-[32px] p-8 relative overflow-hidden h-full group">
       <div className="flex justify-between items-start mb-10">
         <div>
           <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-1">Impact Analysis</p>
