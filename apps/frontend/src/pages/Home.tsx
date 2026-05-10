@@ -45,7 +45,7 @@ export default function Home() {
     <PageTransition>
       <div className="relative">
         {/* Ethereal Hero Section */}
-        <section className="relative min-h-screen mesh-gradient-beauty overflow-visible flex items-center pt-20">
+        <section className="relative min-h-screen mesh-gradient-beauty overflow-hidden flex items-center pt-20 pb-20 lg:pb-0">
           <motion.div 
             style={{ y: y1, opacity }}
             className="absolute inset-0 z-0 overflow-hidden"
@@ -54,7 +54,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-obsidian/50 to-obsidian" />
           </motion.div>
 
-          <div className="relative z-10 max-w-7xl mx-auto px-8 w-full text-center lg:text-left grid lg:grid-cols-[1.2fr,0.8fr] gap-12 items-center">
+          <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 w-full text-center lg:text-left grid grid-cols-1 lg:grid-cols-[1.2fr,0.8fr] gap-12 items-center">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -70,7 +70,7 @@ export default function Home() {
                 <span className="text-neon-blue text-[10px] font-black uppercase tracking-[0.5em]">The Art of Living</span>
               </motion.div>
 
-              <h1 className="font-beauty text-7xl lg:text-[110px] text-white leading-[0.85] tracking-tighter mb-10">
+              <h1 className="font-beauty text-5xl md:text-7xl lg:text-[110px] text-white leading-[1.1] lg:leading-[0.85] tracking-tighter mb-10">
                 Your <span className="italic font-normal text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/20">Sanctuary</span>. <br />
                 <span className="text-beauty-gradient">Reimagined.</span>
               </h1>
@@ -80,13 +80,15 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-6 justify-center lg:justify-start">
-                <motion.button 
-                  whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(0, 209, 255, 0.4)" }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-12 py-6 bg-white text-obsidian font-black rounded-[20px] flex items-center gap-3 uppercase tracking-widest text-xs transition-all shadow-2xl"
-                >
-                  Discover the Suites <ArrowRight size={16} />
-                </motion.button>
+                <NavLink to="/properties">
+                  <motion.button 
+                    whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(0, 209, 255, 0.4)" }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-12 py-6 bg-white text-obsidian font-black rounded-[20px] flex items-center gap-3 uppercase tracking-widest text-xs transition-all shadow-2xl btn-primary-glow"
+                  >
+                    Discover the Suites <ArrowRight size={16} />
+                  </motion.button>
+                </NavLink>
                 <NavLink to="/properties">
                   <motion.div 
                     whileHover={{ backgroundColor: "rgba(255,255,255,0.08)", borderColor: "rgba(255,255,255,0.2)" }}

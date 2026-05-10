@@ -12,192 +12,286 @@ enum Role {
   ADMIN
   RESIDENT
   OWNER
+  STAFF
+}
+
+enum userrole {
+  ADMIN
+  RESIDENT
+  OWNER
+  STAFF
 }
 
 model User {
-  id                 Int      @id @default(autoincrement())
-  username           String   @unique
-  email              String   @unique
-  password_hash      String
-  full_name          String
-  phone              String?
-  role               Role     @default(RESIDENT)
-  two_factor_enabled Boolean  @default(false)
-  two_factor_secret  String?
-  referral_code      String   @unique
-  referred_by        String?
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
+  id                                             Int                         @id @default(autoincrement())
+  username                                       String                      @unique(map: "ix_users_username") @db.VarChar(255)
+  email                                          String                      @unique(map: "ix_users_email") @db.VarChar(255)
+  full_name                                      String?                     @db.VarChar(255)
+  phone                                          String?                     @db.VarChar(20)
+  password_hash                                  String                      @map("hashed_password") @db.VarChar(255)
+  role                                           userrole                    @default(RESIDENT)
+  two_factor_enabled                             Boolean?                    @default(false)
+  two_factor_secret                              String?                     @db.VarChar(255)
+  referral_code                                  String?                     @unique(map: "ix_users_referral_code") @db.VarChar(255)
+  referred_by                                    String?                     @db.VarChar(255)
+  created_at                                     DateTime?                   @default(now()) @db.Timestamp(6)
+  updated_at                                     DateTime?                   @default(now()) @updatedAt @db.Timestamp(6)
 
-  bookings     Booking[]
-  payments     PaymentTransaction[]
-  kyc          KYC?
-  escrow       EscrowAccount?
-  fraud_alerts FraudAlert[]
-  reviews      Review[]
-  messages     Message[]
-  notifications Notification[]
-  subscriptions Subscription[]
-  owned_properties Property[] @relation("OwnerProperties")
-  blog_posts    BlogPost[]
+  bookings                                       Booking[]                   @relation("ResidentBookings")
+  payments                                       PaymentTransaction[]
+  kyc                                            KYC?                        @relation("UserKYC")
+  escrow_accounts                                EscrowAccount[]
+  fraud_alerts                                   FraudAlert[]
+  reviews                                        Review[]
+  messages                                       Message[]
+  notifications                                  Notification[]
+  subscriptions                                  Subscription[]
+  blog_posts                                     BlogPost[]
+  owned_properties                               Property[]                  @relation("OwnerProperties")
+
+  @@map("users")
 }
 
 model Property {
-  id               Int      @id @default(autoincrement())
-  owner_id         Int?     
-  name             String
-  description      String?
-  state_iso        String
-  city             String
-  rent             Float
-  beds             String
-  occupancy        Int      @default(0)
-  active           Boolean  @default(true)
-  cover_image_url  String?
-  matterport_url   String?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  id              Int             @id @default(autoincrement())
+  owner_id        Int?
+  name            String          @db.VarChar(255)
+  description     String?
+  city            String          @db.VarChar(100)
+  state           String?         @db.VarChar(100)
+  state_iso       String?         @db.VarChar(2)
+  address         String?         @db.VarChar(500)
+  beds            Int?
+  baths           Int?
+  rent            Float           @map("monthly_price")
+  occupancy       Float?          @default(0)
+  amenities       Json?           @db.Json
+  featured_image  String?         @db.VarChar(500)
+  cover_image_url String?         @db.VarChar(500)
+  verified        Boolean?        @default(false)
+  active          Boolean?        @default(true)
+  created_at      DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?       @default(now()) @updatedAt @db.Timestamp(6)
 
-  owner    User?     @relation("OwnerProperties", fields: [owner_id], references: [id])
-  bookings Booking[]
-  reviews  Review[]
+  owner           User?           @relation("OwnerProperties", fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  bookings        Booking[]
+  reviews         Review[]
+  photos          PropertyPhoto[]
+
+  @@map("properties")
 }
 
 model Booking {
-  id             Int      @id @default(autoincrement())
-  user_id        Int
-  property_id    Int
-  check_in_date  DateTime
-  check_out_date DateTime
-  status         String   @default("pending") // pending, confirmed, active, completed, cancelled
-  total_amount   Float
-  created_at     DateTime @default(now())
+  id                   Int                  @id @default(autoincrement())
+  property_id          Int?
+  resident_id          Int?                 @map("resident_id")
+  check_in_date        DateTime             @db.Timestamp(6)
+  check_out_date       DateTime             @db.Timestamp(6)
+  total_guests         Int?                 @default(1)
+  total_amount         Float
+  status               String?              @default("pending") @db.VarChar(50)
+  payment_status       String?              @default("pending") @db.VarChar(50)
+  created_at           DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at           DateTime?            @default(now()) @updatedAt @db.Timestamp(6)
 
-  user     User     @relation(fields: [user_id], references: [id])
-  property Property @relation(fields: [property_id], references: [id])
+  property             Property?            @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  resident             User?                @relation("ResidentBookings", fields: [resident_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  escrow_accounts      EscrowAccount?
+  fraud_alerts         FraudAlert[]
+  payment_transactions PaymentTransaction[]
+
+  @@map("bookings")
 }
 
 model PaymentTransaction {
-  id             Int      @id @default(autoincrement())
-  user_id        Int
-  booking_id     Int?
-  amount         Float
-  method         String   // card, upi, netbanking
-  status         String   @default("pending") // pending, completed, failed, refunded
-  transaction_id String?  @unique
-  created_at     DateTime @default(now())
+  id                Int       @id @default(autoincrement())
+  booking_id        Int?
+  user_id           Int?      @map("user_id")
+  stripe_payment_id String?   @unique(map: "ix_payment_transactions_stripe_payment_id") @db.VarChar(255)
+  amount            Float
+  currency          String?   @default("INR") @db.VarChar(10)
+  status            String?   @default("pending") @db.VarChar(50)
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+  updated_at        DateTime? @default(now()) @updatedAt @db.Timestamp(6)
 
-  user User @relation(fields: [user_id], references: [id])
+  booking           Booking?  @relation(fields: [booking_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user              User?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("payment_transactions")
 }
 
 model EscrowAccount {
-  id             Int      @id @default(autoincrement())
-  user_id        Int      @unique
-  balance        Float    @default(0)
-  held_amount    Float    @default(0)
-  disputed_total Float    @default(0)
-  status         String   @default("active")
-  updated_at     DateTime @updatedAt
+  id             Int       @id @default(autoincrement())
+  booking_id     Int?      @unique(map: "ix_escrow_accounts_booking_id")
+  user_id        Int?      @map("user_id")
+  amount_held    Float     @map("amount_held")
+  status         String?   @default("active") @db.VarChar(50)
+  release_date   DateTime? @db.Timestamp(6)
+  dispute_reason String?
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @updatedAt @db.Timestamp(6)
 
-  user User @relation(fields: [user_id], references: [id])
+  booking        Booking?  @relation(fields: [booking_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user           User?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("escrow_accounts")
 }
 
 model FraudAlert {
-  id          Int      @id @default(autoincrement())
-  user_id     Int
-  type        String
-  risk_score  Float
-  details     String?
-  resolved    Boolean  @default(false)
-  created_at  DateTime @default(now())
+  id          Int       @id @default(autoincrement())
+  user_id     Int?
+  booking_id  Int?
+  severity    String?   @db.VarChar(50)
+  alert_type  String    @db.VarChar(100)
+  description String
+  status      String?   @default("pending") @db.VarChar(50)
+  score       Float?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
 
-  user User @relation(fields: [user_id], references: [id])
+  booking     Booking?  @relation(fields: [booking_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user        User?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("fraud_alerts")
 }
 
 model KYC {
-  id              Int      @id @default(autoincrement())
-  user_id         Int      @unique
-  document_type   String
-  document_number String
-  document_url    String
-  status          String   @default("pending") // pending, verified, rejected
-  created_at      DateTime @default(now())
+  id              Int       @id @default(autoincrement())
+  user_id         Int?      @unique
+  document_type   String    @db.VarChar(50)
+  document_url    String    @map("file_path") @db.VarChar(500)
+  status          String?   @default("pending") @db.VarChar(50)
+  reviewed_by     Int?
+  review_notes    String?
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+  updated_at      DateTime? @default(now()) @db.Timestamp(6)
 
-  user User @relation(fields: [user_id], references: [id])
+  user            User?     @relation("UserKYC", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("kyc_documents")
 }
 
 model Review {
-  id          Int      @id @default(autoincrement())
-  user_id     Int
-  property_id Int
-  rating      Int
-  comment     String?
-  created_at  DateTime @default(now())
+  id               Int               @id @default(autoincrement())
+  property_id      Int?
+  user_id          Int?
+  rating           Float
+  comment          String?
+  is_featured      Boolean?          @default(false)
+  status           String?           @default("published") @db.VarChar(50)
+  created_at       DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?         @default(now()) @db.Timestamp(6)
 
-  user     User     @relation(fields: [user_id], references: [id])
-  property Property @relation(fields: [property_id], references: [id])
+  property         Property?         @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user             User?             @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("reviews")
 }
 
 model Message {
-  id         Int      @id @default(autoincrement())
-  sender_id  Int
-  content    String
-  created_at DateTime @default(now())
+  id              Int           @id @default(autoincrement())
+  sender_id       Int
+  content         String
+  is_read         Boolean?      @default(false)
+  created_at      DateTime?     @default(now()) @db.Timestamp(6)
 
-  sender User @relation(fields: [sender_id], references: [id])
+  user            User          @relation(fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("messages")
 }
 
 model Notification {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   user_id    Int
-  title      String
-  message    String
-  read       Boolean  @default(false)
-  created_at DateTime @default(now())
+  type       String    @db.VarChar(50)
+  title      String    @db.VarChar(255)
+  message    String?   @map("body")
+  read       Boolean?  @default(false) @map("is_read")
+  created_at DateTime? @default(now()) @db.Timestamp(6)
 
-  user User @relation(fields: [user_id], references: [id])
+  user       User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("notifications")
 }
 
 model SubscriptionPlan {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  price       Float
-  interval    String   @default("month")
-  features    Json?
-  active      Boolean  @default(true)
-  created_at  DateTime @default(now())
-
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(100)
+  description   String?
+  price         Float
+  interval      String?        @default("month") @db.VarChar(20)
+  features      Json?          @db.Json
+  active        Boolean?       @default(true)
+  created_at    DateTime?      @default(now()) @db.Timestamp(6)
   subscriptions Subscription[]
+
+  @@map("subscription_plans")
 }
 
 model Subscription {
-  id                     Int      @id @default(autoincrement())
-  user_id                Int
-  plan_id                Int
-  stripe_subscription_id String   @unique
-  status                 String   @default("active")
-  current_period_start   DateTime @default(now())
-  current_period_end     DateTime @default(now())
-  created_at             DateTime @default(now())
-  updated_at             DateTime @updatedAt
+  id                     Int               @id @default(autoincrement())
+  user_id                Int?
+  plan_id                Int?
+  stripe_subscription_id String?           @unique(map: "ix_subscriptions_stripe_subscription_id") @db.VarChar(255)
+  status                 String?           @default("active") @db.VarChar(50)
+  current_period_start   DateTime?         @db.Timestamp(6)
+  current_period_end     DateTime?         @db.Timestamp(6)
+  created_at             DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at             DateTime?         @default(now()) @updatedAt @db.Timestamp(6)
 
-  user User             @relation(fields: [user_id], references: [id])
-  plan SubscriptionPlan @relation(fields: [plan_id], references: [id])
+  plan                   SubscriptionPlan? @relation(fields: [plan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                   User?             @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("subscriptions")
 }
 
 model BlogPost {
-  id           Int      @id @default(autoincrement())
-  title        String
-  slug         String   @unique
-  excerpt      String
-  content      String   @db.Text
+  id             Int      @id @default(autoincrement())
+  title          String
+  slug           String   @unique
+  excerpt        String
+  content        String   @db.Text
   featured_image String?
-  category     String
-  tags         String[]
-  view_count   Int      @default(0)
-  published_at DateTime @default(now())
-  author_id    Int
+  category       String
+  tags           String[]
+  view_count     Int      @default(0)
+  published_at   DateTime @default(now())
+  author_id      Int
   
-  author       User     @relation(fields: [author_id], references: [id])
+  author         User     @relation(fields: [author_id], references: [id])
+
+  @@map("blog_posts")
+}
+
+model Testimonial {
+  id          Int      @id @default(autoincrement())
+  name        String
+  role        String
+  content     String
+  avatar_url  String?
+  rating      Int      @default(5)
+  created_at  DateTime @default(now())
+
+  @@map("testimonials")
+}
+
+model FAQ {
+  id          Int      @id @default(autoincrement())
+  question    String
+  answer      String
+  category    String?
+  active      Boolean  @default(true)
+
+  @@map("faqs")
+}
+
+model PropertyPhoto {
+  id          Int      @id @default(autoincrement())
+  property_id Int
+  url         String
+  alt_text    String?
+  
+  property    Property @relation(fields: [property_id], references: [id])
+
+  @@map("property_photos")
 }

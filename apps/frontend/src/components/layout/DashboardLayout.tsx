@@ -86,7 +86,7 @@ export default function DashboardLayout({
                <span className="text-xl font-black text-neon-blue lg:hidden">G</span>
                {(isSidebarOpen || isMobileMenuOpen) && (
                  <span className="text-xl font-black tracking-tighter text-white">
-                   GOFLEX<span className="text-neon-blue">.</span>
+                   GoFlex <span className="text-neon-blue">Housing</span>
                  </span>
                )}
             </div>

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getAllProperties, getPropertyById, createProperty, updateProperty, deleteProperty } from '../controllers/property.controller';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticateJWT as authenticate } from '../middleware/auth.middleware';
 
 const router = Router();
 
