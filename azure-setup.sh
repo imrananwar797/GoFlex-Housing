@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # azure-setup.sh
-# GoFlex Housing Azure Foundations Setup Automation
+# GoFlex Housing Azure Hybrid Foundations Setup Automation
 set -euo pipefail
 
 # Ensure Azure CLI wbin paths are included in the PATH for Git Bash/MINGW environment
@@ -8,19 +8,17 @@ export PATH=$PATH:"/c/Program Files/Microsoft SDKs/Azure/CLI2/wbin":"/c/Program 
 
 # Define operational variables
 RESOURCE_GROUP="GoFlex-Housing"
-LOCATION="eastus"
+LOCATION="centralindia"  # Target region matching Free F1 tier availability
 ACR_NAME="goflexregistry"
-ACA_ENV="goflex-managed-env"
-DB_SERVER_NAME="goflex-db-server"
-DB_USER="goflex_admin"
-DB_PASS="GoFlexSecureDbPass2026!"
+PLAN_NAME="goflex-service-plan"
+WEBAPP_NAME="GoFlex-Housing"
 
 echo "=========================================================="
-echo " Starting GoFlex Housing Azure Setup & Provisioning"
+echo " Starting GoFlex Housing Azure Hybrid Setup & Provisioning"
 echo "=========================================================="
 
-# 1. Create Resource Group
-echo "--> Creating Resource Group '$RESOURCE_GROUP' in region '$LOCATION'..."
+# 1. Create/Verify Resource Group
+echo "--> Creating/Verifying Resource Group '$RESOURCE_GROUP' in region '$LOCATION'..."
 az group create --name "$RESOURCE_GROUP" --location "$LOCATION"
 
 # 2. Create Azure Container Registry (Basic SKU, Admin Enabled)
@@ -31,33 +29,37 @@ az acr create \
   --sku Basic \
   --admin-enabled true
 
-# 3. Register Container App and Operational Insights providers if not present
-echo "--> Registering required Azure resource providers..."
-az provider register --namespace Microsoft.App --wait
-az provider register --namespace Microsoft.OperationalInsights --wait
-
-# 4. Create Azure Container Apps Managed Environment
-echo "--> Creating Azure Container Apps Managed Environment '$ACA_ENV'..."
-az containerapp env create \
-  --name "$ACA_ENV" \
+# 3. Create Free F1 Service Plan (Linux)
+echo "--> Creating Free Linux App Service Plan '$PLAN_NAME' in '$LOCATION'..."
+az appservice plan create \
+  --name "$PLAN_NAME" \
   --resource-group "$RESOURCE_GROUP" \
-  --location "$LOCATION"
-
-# 5. Create Azure Database for PostgreSQL (Flexible Server)
-echo "--> Creating Azure Database for PostgreSQL Flexible Server '$DB_SERVER_NAME'..."
-az postgres flexible-server create \
-  --resource-group "$RESOURCE_GROUP" \
-  --name "$DB_SERVER_NAME" \
   --location "$LOCATION" \
-  --admin-user "$DB_USER" \
-  --admin-password "$DB_PASS" \
-  --sku-name Standard_B1ms \
-  --tier Burstable \
-  --public-access all \
-  --yes
+  --is-linux \
+  --sku F1
+
+# 4. Create Web App (Linux Container)
+echo "--> Creating Linux Container Web App '$WEBAPP_NAME'..."
+az webapp create \
+  --name "$WEBAPP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --plan "$PLAN_NAME" \
+  --deployment-container-image-name "$ACR_NAME.azurecr.io/goflex-core-api:latest"
+
+# 5. Configure Web App Connection Settings to point to Supabase Postgres
+echo "--> Configuring App Settings (Database and Environment settings)..."
+az webapp config appsettings set \
+  --name "$WEBAPP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --settings \
+    PORT=5000 \
+    NODE_ENV=production \
+    DATABASE_URL="postgresql://postgres.wzrphhppzfczkxxihyiy:<YOUR_DATABASE_PASSWORD>@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres?pgbouncer=true" \
+    DIRECT_URL="postgresql://postgres.wzrphhppzfczkxxihyiy:<YOUR_DATABASE_PASSWORD>@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres" \
+    AI_SERVICE_URL="http://localhost:8001" \
+    JWT_SECRET="goflex-express-jwt-secret-key-production"
 
 echo "=========================================================="
-echo " Azure Setup Complete! Foundational Workspace Ready."
-echo " Database Server: $DB_SERVER_NAME.postgres.database.azure.com"
-echo " Database Admin: $DB_USER"
+echo " Azure Hybrid Setup Complete! Foundational Workspace Ready."
+echo " App Service URL: https://$WEBAPP_NAME.azurewebsites.net"
 echo "=========================================================="
