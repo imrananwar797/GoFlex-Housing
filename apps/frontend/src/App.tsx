@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
 import { Menu, X, Mail, Phone, ShieldCheck, Github, Twitter, Linkedin } from 'lucide-react';
@@ -132,7 +132,30 @@ function NavLocationPicker() {
 
 export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstallBtn, setShowInstallBtn] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallBtn(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const triggerInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+      setShowInstallBtn(false);
+    }
+  };
 
   // Close mobile menu on route change
   React.useEffect(() => {
@@ -223,6 +246,13 @@ export default function App() {
                     <NavLocationPicker />
                   </div>
                   
+                  {/* Install App button if PWA is installable */}
+                  {showInstallBtn && (
+                    <button onClick={triggerInstall} className="hidden sm:block px-4 py-2 bg-neon-blue text-obsidian font-black rounded-full text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_15px_rgba(0,209,255,0.2)]">
+                      Install App
+                    </button>
+                  )}
+
                   {/* Search Bar (Hidden on mobile) */}
                   <div className="relative hidden md:block">
                     <input 
@@ -304,6 +334,11 @@ export default function App() {
                     <div className="sm:hidden block">
                       <NavLocationPicker />
                     </div>
+                    {showInstallBtn && (
+                      <button onClick={() => { triggerInstall(); setIsMobileMenuOpen(false); }} className="w-full py-3.5 bg-neon-blue text-obsidian font-black rounded-xl text-xs uppercase tracking-widest hover:scale-105 transition-all">
+                        Install PWA App
+                      </button>
+                    )}
                     <NavAuthActions />
                   </div>
                 </motion.div>
@@ -469,6 +504,25 @@ export default function App() {
                 </div>
               </div>
             </footer>
+          )}
+
+          {/* Global Floating PWA Install Notification */}
+          {showInstallBtn && !dismissed && (
+            <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }}
+              className="fixed bottom-6 left-6 z-[2000] max-w-sm bg-[#0B0E14] border border-white/10 p-5 rounded-3xl flex items-center justify-between gap-4 shadow-2xl backdrop-blur-xl">
+              <div className="space-y-1">
+                <p className="text-white font-bold text-xs">Install GoFlex Web App</p>
+                <p className="text-slate-500 text-[10px] leading-relaxed">Add to home screen for real-time menu alerts & gate entries.</p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button onClick={triggerInstall} className="px-4 py-2 bg-neon-blue text-obsidian font-black rounded-xl text-[10px] uppercase tracking-widest hover:scale-105 transition-all">
+                  Install
+                </button>
+                <button onClick={() => setDismissed(true)} className="p-2 text-slate-500 hover:text-white rounded-lg hover:bg-white/5 transition-all">
+                  <X size={14} />
+                </button>
+              </div>
+            </motion.div>
           )}
         </div>
       </AuthProvider>

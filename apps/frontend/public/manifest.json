@@ -1,0 +1,27 @@
+{
+  "short_name": "GoFlex",
+  "name": "GoFlex Rental Operating System",
+  "description": "Flexible, tech-enabled rental ecosystem for high-performers.",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "https://cdn.builder.io/api/v1/image/assets%2Fd6633193bc9341db92fc7ba045098b86%2F7a5b4b23ef0b413783eb1f928bffc680?format=webp&width=192",
+      "type": "image/webp",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://cdn.builder.io/api/v1/image/assets%2Fd6633193bc9341db92fc7ba045098b86%2F7a5b4b23ef0b413783eb1f928bffc680?format=webp&width=512",
+      "type": "image/webp",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#080A0E",
+  "theme_color": "#00D1FF",
+  "display": "standalone",
+  "orientation": "portrait"
+}
