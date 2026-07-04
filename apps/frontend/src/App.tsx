@@ -33,6 +33,11 @@ const OwnerPropertyDetail = React.lazy(() => import('./pages/owner/OwnerProperty
 const OwnerPropertyBookings = React.lazy(() => import('./pages/owner/OwnerPropertyBookings'));
 const OwnerPropertyRevenue = React.lazy(() => import('./pages/owner/OwnerPropertyRevenue'));
 const OwnerPropertyReviews = React.lazy(() => import('./pages/owner/OwnerPropertyReviews'));
+const OwnerComplaints = React.lazy(() => import('./pages/owner/OwnerComplaints'));
+const OwnerRooms       = React.lazy(() => import('./pages/owner/OwnerRooms'));
+const OwnerVisitors    = React.lazy(() => import('./pages/owner/OwnerVisitors'));
+const OwnerUtilities   = React.lazy(() => import('./pages/owner/OwnerUtilities'));
+const OwnerAgreements  = React.lazy(() => import('./pages/owner/OwnerAgreements'));
 
 const AdminOverview = React.lazy(() => import('./pages/admin/AdminOverview'));
 const AdminUsers = React.lazy(() => import('./pages/admin/AdminUsers'));
@@ -51,6 +56,14 @@ const SubscriptionHistory = React.lazy(() => import('./pages/subscriptions/Subsc
 const Referrals = React.lazy(() => import('./pages/Referrals'));
 const Settings = React.lazy(() => import('./pages/Settings'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
+
+// Resident Dashboard Pages
+const ResidentDashboard = React.lazy(() => import('./pages/resident/ResidentDashboard'));
+const ResidentPayments  = React.lazy(() => import('./pages/resident/ResidentPayments'));
+const ResidentComplaints = React.lazy(() => import('./pages/resident/ResidentComplaints'));
+const ResidentCommunity  = React.lazy(() => import('./pages/resident/ResidentCommunity'));
+const ResidentServices   = React.lazy(() => import('./pages/resident/ResidentServices'));
+const ResidentAgreement  = React.lazy(() => import('./pages/resident/ResidentAgreement'));
 
 function NotFound() {
   return (
@@ -74,7 +87,7 @@ function NavAuthActions() {
     ? '/admin/dashboard'
     : user.role === 'owner'
     ? '/owner/dashboard'
-    : '/dashboard';
+    : '/resident/dashboard';
 
   return (
     <div className="nav-actions">
@@ -143,6 +156,7 @@ export default function App() {
   const isDashboard = location.pathname.startsWith('/dashboard') || 
                       location.pathname.startsWith('/admin') || 
                       location.pathname.startsWith('/owner') ||
+                      location.pathname.startsWith('/resident') ||
                       location.pathname.startsWith('/kyc') ||
                       location.pathname.startsWith('/subscriptions') ||
                       location.pathname.startsWith('/referrals') ||
@@ -292,6 +306,11 @@ export default function App() {
                   <Route path="/owner/properties/:id/bookings" element={<RequireAuth role="owner"><OwnerPropertyBookings /></RequireAuth>} />
                   <Route path="/owner/properties/:id/revenue" element={<RequireAuth role="owner"><OwnerPropertyRevenue /></RequireAuth>} />
                   <Route path="/owner/properties/:id/reviews" element={<RequireAuth role="owner"><OwnerPropertyReviews /></RequireAuth>} />
+                  <Route path="/owner/complaints"  element={<RequireAuth role="owner"><OwnerComplaints /></RequireAuth>} />
+                  <Route path="/owner/rooms"        element={<RequireAuth role="owner"><OwnerRooms /></RequireAuth>} />
+                  <Route path="/owner/visitors"     element={<RequireAuth role="owner"><OwnerVisitors /></RequireAuth>} />
+                  <Route path="/owner/utilities"    element={<RequireAuth role="owner"><OwnerUtilities /></RequireAuth>} />
+                  <Route path="/owner/agreements"   element={<RequireAuth role="owner"><OwnerAgreements /></RequireAuth>} />
 
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
@@ -310,6 +329,12 @@ export default function App() {
 
                   {/* Resident/KYC/Subscription Routes */}
                   <Route path="/dashboard" element={<RequireAuth role="resident"><UserDashboard /></RequireAuth>} />
+                  <Route path="/resident/dashboard" element={<RequireAuth role="resident"><ResidentDashboard /></RequireAuth>} />
+                  <Route path="/resident/payments"  element={<RequireAuth role="resident"><ResidentPayments /></RequireAuth>} />
+                  <Route path="/resident/complaints" element={<RequireAuth role="resident"><ResidentComplaints /></RequireAuth>} />
+                  <Route path="/resident/community"  element={<RequireAuth role="resident"><ResidentCommunity /></RequireAuth>} />
+                  <Route path="/resident/services"   element={<RequireAuth role="resident"><ResidentServices /></RequireAuth>} />
+                  <Route path="/resident/agreement"  element={<RequireAuth role="resident"><ResidentAgreement /></RequireAuth>} />
                   <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
                   <Route path="/referrals" element={<RequireAuth role="resident"><Referrals /></RequireAuth>} />
                   

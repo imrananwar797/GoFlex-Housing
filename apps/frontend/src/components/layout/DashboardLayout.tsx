@@ -13,7 +13,14 @@ import {
   Settings,
   Home,
   Sparkles,
-  BookOpen
+  BookOpen,
+  CreditCard,
+  AlertCircle,
+  FileText,
+  ShoppingBag,
+  MessageCircle,
+  DoorOpen,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import NotificationPanel from './NotificationPanel';
@@ -46,19 +53,24 @@ export default function DashboardLayout({
   const defaultNav = user?.role?.toLowerCase() === 'owner' ? [
     { to: '/', label: 'Home', icon: Home },
     { to: '/owner/dashboard', label: 'Overview', icon: LayoutDashboard },
-    { to: '/owner/properties', label: 'My Properties', icon: ShieldCheck },
+    { to: '/owner/properties', label: 'Properties', icon: ShieldCheck },
     { to: '/owner/residents', label: 'Residents', icon: Users },
+    { to: '/owner/rooms', label: 'Rooms', icon: DoorOpen },
+    { to: '/owner/complaints', label: 'Complaints', icon: AlertCircle },
+    { to: '/owner/visitors', label: 'Visitors', icon: Users },
+    { to: '/owner/utilities', label: 'Utilities', icon: Zap },
+    { to: '/owner/agreements', label: 'Agreements', icon: FileText },
     { to: '/owner/revenue', label: 'Revenue', icon: Receipt },
-    { to: '/amenities', label: 'Amenities', icon: Sparkles },
-    { to: '/blog', label: 'Blog', icon: BookOpen },
   ] : [
     { to: '/', label: 'Home', icon: Home },
-    { to: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-    { to: '/amenities', label: 'Amenities', icon: Sparkles },
-    { to: '/blog', label: 'Blog', icon: BookOpen },
-    { to: '/kyc/status', label: 'AI Verify', icon: ShieldCheck },
+    { to: '/resident/dashboard', label: 'My Stay', icon: LayoutDashboard },
+    { to: '/resident/payments', label: 'Payments', icon: CreditCard },
+    { to: '/resident/complaints', label: 'Complaints', icon: AlertCircle },
+    { to: '/resident/community', label: 'Community', icon: Users },
+    { to: '/resident/services', label: 'Services', icon: ShoppingBag },
+    { to: '/resident/agreement', label: 'Agreement', icon: FileText },
+    { to: '/kyc/status', label: 'KYC Verify', icon: ShieldCheck },
     { to: '/subscriptions/plans', label: 'Billing', icon: Receipt },
-    { to: '/community', label: 'Community', icon: Users },
   ];
 
   const navItems = customNav ? customNav.map(n => ({ ...n, icon: LayoutDashboard })) : defaultNav;

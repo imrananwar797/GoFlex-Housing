@@ -14,6 +14,10 @@ import referralRoutes from './routes/referral.routes';
 import blogRoutes from './routes/blog.routes';
 import subscriptionRoutes from './routes/subscription.routes';
 import ownerRoutes from './routes/owner.routes';
+import complaintRoutes from './routes/complaint.routes';
+import agreementRoutes from './routes/agreement.routes';
+import communityRoutes from './routes/community.routes';
+import servicesRoutes from './routes/services.routes';
 import rateLimit from 'express-rate-limit';
 import prisma from './utils/db.client';
 
@@ -61,6 +65,11 @@ app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/referrals', referralRoutes);
 app.use('/api/ai', aiRoutes);
+// Ecosystem routes
+app.use('/api/complaints', complaintRoutes);
+app.use('/api/agreements', agreementRoutes);
+app.use('/api/community', communityRoutes);
+app.use('/api/services', servicesRoutes);
 
 let cachedStats: any = {
   active_nodes: 3,
