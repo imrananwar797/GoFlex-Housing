@@ -77,3 +77,5 @@ scratch/
 *.tar.gz
 supabase/
 .vercel
+
+.env*.local

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
 import { Menu, X, Mail, Phone, ShieldCheck, Github, Twitter, Linkedin } from 'lucide-react';
 import { Home, Placeholder, Team } from './pages';
@@ -515,7 +515,7 @@ export default function App() {
                 <p className="text-slate-500 text-[10px] leading-relaxed">Add to home screen for real-time menu alerts & gate entries.</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <button onClick={triggerInstall} className="px-4 py-2 bg-neon-blue text-obsidian font-black rounded-xl text-[10px] uppercase tracking-widest hover:scale-105 transition-all">
+                 <button onClick={triggerInstall} className="px-4 py-2 bg-neon-blue text-obsidian font-black rounded-xl text-[10px] uppercase tracking-widest hover:scale-105 transition-all">
                   Install
                 </button>
                 <button onClick={() => setDismissed(true)} className="p-2 text-slate-500 hover:text-white rounded-lg hover:bg-white/5 transition-all">
@@ -524,8 +524,29 @@ export default function App() {
               </div>
             </motion.div>
           )}
+          <OAuthRedirectHandler />
         </div>
       </AuthProvider>
     </ErrorBoundary>
   );
+}
+
+function OAuthRedirectHandler() {
+  const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is logged in and is visiting / or /login with an access token in URL
+    if (user && (location.pathname === '/login' || location.pathname === '/' || window.location.hash.includes('access_token'))) {
+      const redirectPath = user.role === 'owner' 
+        ? '/owner/dashboard' 
+        : user.role === 'admin' 
+        ? '/admin/dashboard' 
+        : '/resident/dashboard';
+      navigate(redirectPath, { replace: true });
+    }
+  }, [user, location.pathname, navigate]);
+
+  return null;
 }
