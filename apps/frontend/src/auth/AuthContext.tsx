@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { authService, AuthUser, Role } from '../services/auth.service';
-import { supabaseService } from '../services/supabase.service';
+import { supabaseService, supabase } from '../services/supabase.service';
 import { socketService } from '../services/socket.service';
 
 interface AuthContextValue {
   user: AuthUser | null;
   login: (u: string, p: string) => Promise<any>;
+  loginWithGoogle: () => Promise<any>;
   register: (data: any) => Promise<void>;
   logout: () => void;
   setUser: (user: AuthUser | null) => void;
@@ -30,6 +31,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch {}
+  }, []);
+
+  // Listen for Supabase OAuth session changes
+  useEffect(() => {
+    if (!supabase) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const localUser: AuthUser = {
+          id: parseInt(session.user.id.replace(/\D/g, '').slice(0, 8)) || 101,
+          username: session.user.email?.split('@')[0] || 'google_user',
+          email: session.user.email || '',
+          role: 'resident',
+          token: session.access_token
+        };
+        setUser(localUser);
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -59,6 +78,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       return res;
     },
+    async loginWithGoogle() {
+      if (!supabase) throw new Error('Supabase not configured');
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/login`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
     async register(data) {
       const res = await authService.register(data);
       const authUser: AuthUser = {
@@ -76,6 +106,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout() { 
       setUser(null); 
       localStorage.removeItem(STORAGE_KEY);
+      if (supabase) {
+        supabase.auth.signOut();
+      }
     }
   }), [user]);
 
