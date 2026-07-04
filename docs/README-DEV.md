@@ -1,117 +1,126 @@
-Development startup
+# GoFlex Housing - Developer Documentation
 
-Recommended (proficient) way to run locally for development:
+This document describes how to set up, run, and develop the GoFlex Housing project locally.
 
-- Use the provided PowerShell script which sets a local SQLite DB and starts uvicorn with reload:
+## Local Development Requirements
 
-```powershell
-.\start-dev.ps1
+- **Node.js**: v20.0.0 or higher
+- **npm**: v10.2.4 or higher
+- **Python**: v3.11 or higher with virtualenv
+- **PostgreSQL**: A running instance or connection to a remote PostgreSQL provider (e.g. Supabase)
+
+---
+
+## 1. Initial Setup
+
+### Workspace Dependencies Installation
+First, install all monorepo dependencies from the root directory:
+```bash
+npm install
 ```
 
-- Or run manually (PowerShell):
+This will automatically trigger workspace installations inside `apps/frontend`, `backend/core`, and `blockchain`.
 
-```powershell
-$env:DATABASE_URL = 'sqlite:///d:/GoFlex Housing/dev.db'
-& ".venv/Scripts/python.exe" -m uvicorn run:app --host 127.0.0.1 --port 8000 --reload --log-level info
+### Python Virtual Environment Setup
+The AI Microservice requires a Python virtual environment to be set up:
+```bash
+# Navigate to the microservice folder
+cd backend/ai
+
+# Create virtual environment
+python -m venv .venv
+
+# Activate it (Windows)
+.venv\Scripts\activate
+# Activate it (Linux/Mac)
+source .venv/bin/activate
+
+# Install requirements
+pip install -r requirements.txt
 ```
 
-Why this is recommended:
-- The original project expects Postgres in production; for fast local iteration SQLite is a safe fallback.
-- The `run:app` import string enables uvicorn reload watching source files.
-- `start-dev.ps1` centralizes the startup command so you don't need to remember env vars.
+---
 
-If you prefer Postgres, ensure it is running locally and set `DATABASE_URL` accordingly.
+## 2. Environment Variables Configuration
 
-Stable (no-reload) startup
+Copy and configure environment files in each service directory.
 
-For running the server in the background or under a supervisor, start without reload:
-
-```powershell
-.\start-stable.ps1 -DbPath 'd:/GoFlex Housing/dev.db' -Port 8000
+### Core Backend (`backend/core/.env`)
+Create `backend/core/.env` with:
+```env
+PORT=8000
+DATABASE_URL="postgresql://postgres.xxx:password@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.xxx:password@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres"
+AI_SERVICE_URL=http://localhost:8001
+JWT_SECRET=your-express-jwt-secret-key-here
 ```
 
-This will set `DATABASE_URL` to the SQLite file and run uvicorn without `--reload`, which is
-more stable for long-running background processes.
+### AI Backend (`backend/ai/.env`)
+Create `backend/ai/.env` with:
+```env
+DATABASE_URL="postgresql://postgres.xxx:password@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres"
+INTERNAL_SECRET=goflex-internal-m2m-secret
+```
 
-Process management options
+### Frontend (`apps/frontend/.env`)
+Create `apps/frontend/.env` with:
+```env
+VITE_API_URL=http://localhost:8000
+VITE_SOCKET_URL=http://localhost:8000
+VITE_SUPABASE_URL=https://xxx.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key-here
+```
 
-- Supervisor (systemd-style host): place `supervisord.conf` on the server and run `supervisord -c supervisord.conf`.
+---
 
-- Procfile (platforms like Heroku): the `Procfile` runs uvicorn via the virtualenv python. When deploying to such platforms, ensure the virtualenv and path are correct.
+## 3. Database Migration & Push
 
-- Docker Compose: a `docker-compose.yml` is included. To run with Postgres locally:
+We use **Prisma** to manage the schema and push migrations to the Postgres database. Run the following in `backend/core`:
 
 ```bash
-docker-compose up --build
+# Generate type-safe Prisma client
+npx prisma generate
+
+# Sync schema state with Postgres
+npx prisma db push
 ```
 
-This composes a `db` Postgres service and a `web` service that runs the app and points `DATABASE_URL` to the Postgres container.
+---
 
-Dockerfile and production image
+## 4. Running the Dev Servers
 
-The included `Dockerfile` builds a simple image using `python:3.11-slim`. To build and run the image locally:
-
+### The Monorepo Way (Recommended)
+You can start all packages simultaneously using Turborepo from the root directory:
 ```bash
-docker build -t goflex-housing .
-docker run --rm -e DATABASE_URL=sqlite:///./dev.db -p 8000:8000 goflex-housing
+npm run dev
 ```
+This runs the frontend at `http://localhost:5173`, core backend at `http://localhost:8000`, and AI microservice at `http://localhost:8001`.
 
-Systemd unit (Linux)
+### Running Components Individually
 
-An example unit file is available at `dist/smartpg.service`. Copy it to `/etc/systemd/system/smartpg.service`, edit paths/venv, then:
+- **Frontend only**:
+  ```bash
+  npm run dev:frontend
+  ```
+- **Core Backend only**:
+  ```bash
+  npm run dev:core
+  ```
+- **AI Microservice only**:
+  Make sure your virtual environment is active, then:
+  ```bash
+  npm run dev:ai
+  ```
 
+---
+
+## 5. Deployment Checks & Lints
+
+Before checking in changes, verify your work using the monorepo checks:
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now smartpg
-sudo journalctl -u smartpg -f
+# Build frontend
+npm run build
+
+# Lint the codebase
+npm run lint
 ```
-
-Makefile
-
-Use the `Makefile` helper targets for common tasks on Windows with PowerShell/make installed:
-
-```bash
-# Start dev server (with reload)
-make start-dev
-
-# Start stable server (no reload)
-make start-stable
-
-# Docker compose up
-make docker-up
-```
-
-Continuous Integration
-
-This repo includes a GitHub Actions workflow at `.github/workflows/ci.yml` which:
-
-- Installs Python dependencies and runs simple checks
-- Starts the app and verifies `/health`
-- Builds the Docker image and validates the container's `/health` endpoint
-
-You can run a local CI smoke-test on Windows using the `ci.ps1` wrapper:
-
-```powershell
-.\ci.ps1
-```
-
-Postgres integration in CI
-
-The GitHub Actions integration job uses a Postgres service. Add the following repository secrets in GitHub (Settings → Secrets → Actions) to enable the integration job:
-
-- `POSTGRES_USER` (e.g. `smartpg`)
-- `POSTGRES_PASSWORD` (e.g. `password`)
-- `POSTGRES_DB` (e.g. `smartpg_ci_db`)
-
-If these aren't set, the integration job will fail; for quick runs the unit-tests job doesn't require Postgres and uses SQLite.
-
-Supabase backend for the React app
-----------------------------------
-1. Create a new Supabase project (or reuse an existing one).
-2. Open the SQL editor and run the script in `supabase/schema.sql` to create tables and seed sample data.
-3. In Project Settings → API, copy the project URL and anon key.
-4. Set the following environment variables for the React app (for local development use `DevServerControl` → `set_env_variable`):
-   - `REACT_APP_SUPABASE_URL`
-   - `REACT_APP_SUPABASE_ANON_KEY`
-5. Restart the React dev server so it picks up the new variables.
-6. Visit the app; properties, gallery, testimonials, and FAQs will now read from Supabase if credentials are present, otherwise they fall back to the bundled sample data.

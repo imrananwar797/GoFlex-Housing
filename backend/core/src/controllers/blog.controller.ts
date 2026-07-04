@@ -28,7 +28,7 @@ export const getPostBySlug = async (req: Request, res: Response) => {
   const { slug } = req.params;
   try {
     const post = await prisma.blogPost.findUnique({
-      where: { slug },
+      where: { slug: slug as string },
       include: { author: { select: { full_name: true, username: true } } }
     });
     if (!post) return res.status(404).json({ error: 'Post not found' });

@@ -9,6 +9,9 @@ services:
       POSTGRES_DB: ${DB_NAME:-goflex_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/ai/database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./backend/ai/database/schema.sql:/docker-entrypoint-initdb.d/02-schema.sql
+      - ./backend/ai/database/seed.sql:/docker-entrypoint-initdb.d/03-seed.sql
     networks:
       - goflex_network
 
@@ -19,7 +22,7 @@ services:
 
   # Node.js Core Backend (System of Record)
   backend-core:
-    build: ./api/core
+    build: ./backend/core
     environment:
       DATABASE_URL: postgresql://${DB_USER:-goflex_user}:${DB_PASSWORD:-goflex_secure_password_123}@db:5432/${DB_NAME:-goflex_db}
       AI_SERVICE_URL: http://backend-ai:8001
@@ -36,11 +39,12 @@ services:
 
   # Python AI Microservice (System of Intelligence)
   backend-ai:
-    build: ./api/ai
+    build: ./backend/ai
     environment:
       DATABASE_URL: postgresql://${DB_USER:-goflex_user}:${DB_PASSWORD:-goflex_secure_password_123}@db:5432/${DB_NAME:-goflex_db}
       INTERNAL_SECRET: ${INTERNAL_SECRET:-goflex-internal-m2m-secret}
       SECRET_KEY: ${SECRET_KEY:-production-secret-key}
+    command: uvicorn main:app --host 0.0.0.0 --port 8001
     depends_on:
       - db
     networks:
@@ -54,7 +58,7 @@ services:
       VITE_API_URL: http://localhost:8000
       VITE_SOCKET_URL: http://localhost:8000
     ports:
-      - "80:80"
+      - "3000:5173"
     depends_on:
       - backend-core
     networks:

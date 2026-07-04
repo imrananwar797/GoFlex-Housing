@@ -1,123 +1,96 @@
-# GoFlex Housing - SmartPG Management System
+# GoFlex Housing - SmartPG Management System (Cyberpunk Sanctuary)
 
-A production-ready FastAPI + React (Vite) project for hostel/PG management with AI, IoT, and rich dashboards.
+GoFlex Housing is a next-generation co-living ecosystem designed for modern tech professionals and residents. Blending a sleek **"Cyberpunk Sanctuary"** aesthetic with state-of-the-art PropTech, GoFlex integrates AI-driven recommendations, blockchain-ready escrow security, and a premium dashboard system.
 
-## Project Structure
+Built on a robust monorepo architecture managed via **Turborepo**, the project combines a React + Vite frontend, a Node.js Express core backend, and a Python FastAPI AI microservice.
+
+---
+
+## 🏗️ Project Architecture & Structure
 
 ```
-goflex-housing/
-├── backend/                 # FastAPI backend
-│   ├── app/                # Application code
-│   │   ├── core/          # Configuration & database
-│   │   ├── models/        # SQLAlchemy models
-│   │   ├── routers/       # API endpoints
-│   │   ├── schemas/       # Pydantic schemas
-│   │   └── services/      # Business logic
-│   ├── database/          # Database schemas & seeds
-│   └── Dockerfile         # Backend container
-├── src/                    # React frontend (Vite)
-│   ├── components/        # Reusable components
-│   ├── pages/            # Page components
-│   ├── services/         # API services
-│   └── hooks/            # Custom React hooks
-├── public/                # Static assets
-├── docs/                  # Documentation
-├── docker-compose.yml     # Development environment
-├── docker-compose.prod.yml # Production environment
-└── .env.example          # Environment variables template
+GoFlex-Housing/ (Monorepo)
+├── apps/
+│   └── frontend/            # React + Vite frontend (Tailwind CSS, Framer Motion, Supabase SDK)
+├── backend/
+│   ├── core/                # Node.js + Express + Prisma ORM (Core Business Logic)
+│   ├── ai/                  # Python + FastAPI + SQLAlchemy ORM (AI Recommendations, Subscriptions, Video, Fraud)
+│   └── database/            # Common schema/seed migrations
+├── blockchain/              # Smart contracts (Solidity contracts, deployment scripts)
+├── docs/                    # Detailed system and feature documentation
+├── package.json             # Root monorepo configuration
+├── turbo.json               # Turborepo task runner configuration
+└── docker-compose.yml       # Dev/production container configurations
 ```
 
-## Quick Start
+---
 
-### Development (Docker - Recommended)
+## 🚀 Quick Start
+
+### 1. Prerequisites
+
+- **Node.js** 20.0.0 or higher
+- **npm** 10.2.4 or higher
+- **Python** 3.11 or higher
+- **PostgreSQL** database (hosted via Supabase)
+
+### 2. Environment Configuration
+
+Copy the example environment templates and fill in your credentials:
+
+- Frontend: [apps/frontend/.env](file:///d:/GoFlex-Housing/apps/frontend/.env) (and `.env.production`)
+- Core Backend: [backend/core/.env](file:///d:/GoFlex-Housing/backend/core/.env)
+- AI Microservice: [backend/ai/.env](file:///d:/GoFlex-Housing/backend/ai/.env)
+
+*Main environment variables include database URLs, Stripe credentials, Twilio API keys, and Supabase URLs.*
+
+### 3. Run Locally (Monorepo)
+
+To spin up all services concurrently using Turborepo, run this command from the root of the project:
 
 ```bash
-# Clone and setup
-git clone <repository-url>
-cd goflex-housing
-cp .env.example .env
-
-# Start all services
-docker-compose up -d
-
-# Access
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
+npm run dev
 ```
 
-### Local Development
+This launches:
+- **Frontend App**: [http://localhost:5173](http://localhost:5173)
+- **Core Express Backend**: [http://localhost:8000](http://localhost:8000)
+- **AI FastAPI Service**: [http://localhost:8001](http://localhost:8001) (Interactive docs available at `/docs`)
 
-1) Backend
+---
 
-```bash
-cd backend
-python -m venv .venv
-# Windows PowerShell
-.venv\Scripts\activate
-# Linux/Mac
-source .venv/bin/activate
+## 🔧 Monorepo Package Scripts
 
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
+You can execute workspace-specific commands from the root directory:
 
-2) Frontend
+*   **Run All Dev Servers**: `npm run dev`
+*   **Run Frontend Only**: `npm run dev:frontend`
+*   **Run Core Backend Only**: `npm run dev:core`
+*   **Run AI Backend Only**: `npm run dev:ai`
+*   **Build Frontend**: `npm run build`
+*   **Lint Codebase**: `npm run lint`
 
-```bash
-cd src
-npm install
-npm start
-```
+---
 
-## Environment
+## 💎 Features Catalog
 
-Copy `.env.example` to `.env` and adjust values for your environment.
+*   ✅ **Cyberpunk Sanctuary Landing Page**: Fluid Framer Motion animations, location grids, and smart booking bar.
+*   ✅ **AI-Powered Recommendation Engine**: Score-based property matching based on resident behavior and preferences.
+*   ✅ **User & Resident Dashboards**: Real-time occupancy status, booking histories, and profile settings.
+*   ✅ **KYC Documents Pipeline**: Secure upload and verification flow for resident identity checks.
+*   ✅ **Subscription Billing**: Stripe-integrated tiered memberships (Essential, Premium, Founder).
+*   ✅ **Admin/Owner Management Panels**: Complete user permissions editing, property verification queue, and revenue trends.
+*   ✅ **Escrow System**: Web3/blockchain-ready rent holding and conditional release contracts.
 
-## Deployment
+---
 
-### Development
-```bash
-docker-compose up -d
-```
+## 📚 Documentation
 
-### Production
-```bash
-docker-compose -f docker-compose.prod.yml up -d --build
-```
+For deep dives into design specifications, deployment, and status logs:
+*   [DEPLOYMENT_GUIDE.md](file:///d:/GoFlex-Housing/docs/DEPLOYMENT_GUIDE.md) - Detailed local and production setup guide.
+*   [PROJECT_STRUCTURE.md](file:///d:/GoFlex-Housing/docs/PROJECT_STRUCTURE.md) - High-level architectural directory map.
+*   [IMPLEMENTATION_STATUS.md](file:///d:/GoFlex-Housing/docs/IMPLEMENTATION_STATUS.md) - Detailed breakdown of all phases.
+*   [FINAL_SUBMISSION.md](file:///d:/GoFlex-Housing/FINAL_SUBMISSION.md) - Overview of project achievements and roadmaps.
 
-## Features
-
-- ✅ **User Management**: Registration, authentication, 2FA
-- ✅ **Property Management**: CRUD operations for properties
-- ✅ **Advanced Search**: Filter by location, price, amenities, dates
-- ✅ **Real-time Inventory**: Room availability and booking management
-- ✅ **Admin Dashboard**: User management and platform analytics
-- ✅ **Owner Panel**: Property management for owners
-- ✅ **KYC Verification**: Document upload and admin review
-- ✅ **Payments**: Stripe subscription integration
-- ✅ **Real-time Messaging**: WebSocket-based chat
-- ✅ **Notifications**: Email/SMS alerts
-- ✅ **Analytics**: Revenue and occupancy reporting
-
-## API Documentation
-
-When running, visit `http://localhost:8000/docs` for interactive API documentation.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests
-5. Submit a pull request
-
-## License
-
-See LICENSE file for details.
-
-## Support
-
-For questions or issues, check the documentation in the `docs/` folder or create an issue in the repository.
-
-
+---
+*Created by the GoFlex Housing Development Team.*

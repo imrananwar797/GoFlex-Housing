@@ -1,27 +1,46 @@
-# Use Node.js 20 as base
-FROM node:20-slim
-
-# Set working directory
+# Stage 1: Build
+FROM node:20-slim AS builder
 WORKDIR /app
 
-# Install system dependencies
+# Install openssl for Prisma compatibility
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
-# Copy package files and install
+# Copy package descriptors and install all dependencies (including devDependencies)
 COPY package*.json ./
 RUN npm install
 
-# Copy source and prisma schema
+# Copy source and prisma configuration
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma Client
 RUN npx prisma generate
 
-# Build the project
-RUN npm run build
+# Compile TypeScript to JavaScript (npm run compile runs tsc)
+RUN npm run compile
 
-# Expose port
-EXPOSE 8000
+# Stage 2: Production Runner
+FROM node:20-slim AS runner
+WORKDIR /app
 
-# Start the application
-CMD ["npm", "start"]
+# Install openssl in production stage
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+ENV NODE_ENV=production
+
+# Copy package files and install only production dependencies
+COPY package*.json ./
+RUN npm install --omit=dev
+
+# Copy generated Prisma Client modules from builder
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Copy compiled JavaScript output
+COPY --from=builder /app/dist ./dist
+
+# Expose Port 5000 (User specified Core API port)
+EXPOSE 5000
+ENV PORT=5000
+
+# Start Express server
+CMD ["node", "dist/index.js"]

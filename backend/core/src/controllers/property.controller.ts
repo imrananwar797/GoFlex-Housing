@@ -57,7 +57,7 @@ export const updateProperty = async (req: Request, res: Response) => {
 
   try {
     const property = await prisma.property.update({
-      where: { id: parseInt(id), owner_id },
+      where: { id: parseInt(id as string), owner_id },
       data
     });
     res.json(property);
@@ -72,7 +72,7 @@ export const deleteProperty = async (req: Request, res: Response) => {
 
   try {
     await prisma.property.delete({
-      where: { id: parseInt(id), owner_id }
+      where: { id: parseInt(id as string), owner_id }
     });
     res.json({ message: 'Property deleted' });
   } catch (error) {

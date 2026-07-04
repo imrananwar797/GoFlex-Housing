@@ -1,485 +1,119 @@
-# GoFlex Housing - Complete Deployment Guide
+# GoFlex Housing - Comprehensive Deployment Guide
 
-## � Quick Start
-
-### Development (Docker)
-```bash
-cd GoFlex-Housing
-cp .env.example .env
-docker-compose up -d
-```
-
-**Access:**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
-- Database: localhost:5432
-
-### Production (Docker)
-```bash
-cd GoFlex-Housing
-cp .env.prod.example .env
-docker-compose -f docker-compose.prod.yml up -d
-```
-
----
-
-## 📋 Prerequisites
-
-- Docker & Docker Compose
-- Node.js 18+ (for frontend development)
-- Python 3.11+ (for backend development)
-- PostgreSQL (handled by Docker)
+This guide details how to deploy the GoFlex Housing platform to production and configure environment settings.
 
 ---
 
 ## 🏗️ Architecture Overview
 
-```
-Frontend (React/TypeScript)
-    ↓ HTTP/WebSocket
-Backend (FastAPI/Python)
-    ↓ SQLAlchemy
-Database (PostgreSQL)
-```
-
-**Key Features Implemented:**
-- ✅ User Authentication & Authorization
-- ✅ Real-time Messaging (WebSocket)
-- ✅ Property Search & Filtering
-- ✅ Room Inventory Management
-- ✅ Admin Dashboard
-- ✅ Owner Property Management
-- ✅ KYC Document Verification
-- ✅ Stripe Subscription Payments
-- ✅ Two-Factor Authentication
-- ✅ Rate Limiting & Security
-- ✅ Analytics Dashboard
+The system is split into three main components:
+1.  **Frontend SPA**: A Vite React application with Tailwind CSS and Framer Motion. Recommended hosting: **Vercel** or **Netlify**.
+2.  **Core Backend**: An Express Node.js application running TypeScript and Prisma. Recommended hosting: **Render**, **AWS ECS**, or **GCP Cloud Run**.
+3.  **AI Microservice**: A Python FastAPI service running SQLAlchemy. Recommended hosting: **Render**, **AWS ECS**, or **GCP Cloud Run**.
+4.  **Database**: A PostgreSQL database. Recommended hosting: **Supabase** (Managed PostgreSQL).
+5.  **Blockchain**: Solidity smart contracts deployed on Polygon (Amoy testnet or mainnet).
 
 ---
 
-## 🔧 Environment Setup
+## 🔧 Environment Configurations
 
-### 1. Clone Repository
-```bash
-git clone <repository-url>
-cd GoFlex-Housing
-```
-
-### 2. Environment Variables
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your values:
+### 1. Frontend (`apps/frontend/.env` / Vercel Environment Variables)
 ```env
-# Database
-DB_USER=goflex_user
-DB_PASSWORD=your_secure_password
-DB_NAME=goflex_db
-
-# Security
-SECRET_KEY=your-super-secret-jwt-key-change-in-production
-
-# Stripe (for payments)
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_PUBLISHABLE_KEY=pk_test_...
-
-# Email (for notifications)
-SMTP_SERVER=smtp.gmail.com
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-
-# SMS (Twilio for 2FA)
-TWILIO_ACCOUNT_SID=your-twilio-sid
-TWILIO_AUTH_TOKEN=your-twilio-token
-TWILIO_PHONE_NUMBER=+1234567890
-
-# Frontend
-FRONTEND_URL=http://localhost:3000
+VITE_API_URL=https://goflex-core-backend.onrender.com
+VITE_SOCKET_URL=https://goflex-core-backend.onrender.com
+VITE_SUPABASE_URL=https://your-supabase-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key-here
 ```
+
+### 2. Core Backend (`backend/core/.env` / Render Environment Variables)
+```env
+PORT=8000
+DATABASE_URL="postgresql://postgres.xxx:password@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres.xxx:password@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres"
+AI_SERVICE_URL=https://goflex-ai-backend.onrender.com
+INTERNAL_SECRET=goflex-internal-m2m-secret
+JWT_SECRET=your-production-jwt-secret-here
+CORS_ORIGIN=https://goflex-housing.vercel.app
+
+# Optional integrations
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=your-token
+TWILIO_PHONE_NUMBER=+1234567890
+POLYGON_RPC_URL=https://rpc-amoy.polygon.technology
+ADMIN_WALLET_PRIVATE_KEY=your-admin-private-key
+ESCROW_CONTRACT_ADDRESS=0x...
+```
+
+### 3. AI Microservice (`backend/ai/.env` / Render Environment Variables)
+```env
+DATABASE_URL="postgresql://postgres.xxx:password@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres"
+INTERNAL_SECRET=goflex-internal-m2m-secret
+```
+
+---
+
+## 🚀 Production Deployment Steps
+
+### Step 1: Database Setup
+1.  Spin up a managed PostgreSQL database (such as on **Supabase**).
+2.  Obtain the Connection Pool string (port `5432` or PGBouncer equivalent) for `DATABASE_URL` and the direct connection string for `DIRECT_URL`.
+3.  In your local terminal, run Prisma commands to generate models and push schema changes to the live database:
+    ```bash
+    cd backend/core
+    npx prisma generate
+    npx prisma db push
+    ```
+
+### Step 2: Deploy AI Microservice (Render)
+1.  Create a **Web Service** on Render connected to your git repository.
+2.  Set **Language** to `Python 3`.
+3.  Set the **Build Command** to `pip install -r backend/ai/requirements.txt`.
+4.  Set the **Start Command** to `cd backend/ai && uvicorn main:app --host 0.0.0.0 --port $PORT`.
+5.  Add the `DATABASE_URL` and `INTERNAL_SECRET` environment variables.
+
+### Step 3: Deploy Core Backend (Render)
+1.  Create a **Web Service** on Render.
+2.  Set **Language** to `Node`.
+3.  Set the **Build Command** to `npm install && npx prisma generate`.
+4.  Set the **Start Command** to `cd backend/core && node dist/index.js` (or use `ts-node src/index.ts` if running TypeScript directly).
+5.  Add the environment variables (`DATABASE_URL`, `DIRECT_URL`, `AI_SERVICE_URL`, `JWT_SECRET`, `CORS_ORIGIN`).
+
+### Step 4: Deploy Frontend (Vercel)
+1.  Import your project into Vercel.
+2.  Choose `Vite` as the framework preset.
+3.  Set the **Root Directory** to `apps/frontend`.
+4.  Add environment variables (`VITE_API_URL`, `VITE_SOCKET_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
+5.  Deploy. Vercel will build the distribution bundle and host it on its global edge network.
 
 ---
 
 ## 🐳 Docker Deployment
 
-### Development
+The repository includes a `docker-compose.yml` configuration. To run all services in containers locally:
+
+1.  Configure environment variables in a root `.env` file.
+2.  Run the composition command:
+    ```bash
+    docker-compose up -d --build
+    ```
+
+For production-grade Docker deployment, use `docker-compose.prod.yml`:
 ```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
-
-### Production
-```bash
-# Build and start production stack
 docker-compose -f docker-compose.prod.yml up -d --build
-
-# Scale backend workers
-docker-compose -f docker-compose.prod.yml up -d --scale backend=4
 ```
-
----
-
-## 💻 Local Development
-
-### Backend Setup
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-### Frontend Setup
-```bash
-cd src  # React app is in src/
-npm install
-npm start
-```
-
-### Database Migrations
-```bash
-cd backend
-alembic upgrade head
-```
-
----
-
-## 🔒 Security Features
-
-- JWT Authentication with refresh tokens
-- Two-Factor Authentication (TOTP)
-- Rate limiting (100 requests/minute per IP)
-- CORS protection
-- Password hashing (bcrypt)
-- Input validation with Pydantic
-- SQL injection prevention (SQLAlchemy)
-
----
-
-## 📊 API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/token` - Login
-- `POST /api/auth/2fa/setup` - Setup 2FA
-- `POST /api/auth/2fa/verify` - Verify 2FA
-
-### Properties & Search
-- `GET /api/search/properties` - Advanced property search
-- `POST /api/owner/properties` - Create property (owners)
-- `GET /api/owner/properties` - List owner properties
-
-### Bookings & Inventory
-- `GET /api/inventory/rooms/{room_id}/availability` - Check availability
-- `POST /api/inventory/rooms/{room_id}/book` - Create booking
-
-### Admin
-- `GET /api/admin/users` - User management
-- `GET /api/admin/stats` - Platform statistics
-- `GET /api/analytics/dashboard` - Analytics dashboard
-
-### Payments
-- `GET /api/subscriptions/plans` - Subscription plans
-- `POST /api/subscriptions/create-checkout-session` - Stripe checkout
-
----
-
-## 🧪 Testing
-
-### Backend Tests
-```bash
-cd backend
-pytest
-```
-
-### Frontend Tests
-```bash
-cd src
-npm test
-```
-
----
-
-## 📈 Monitoring & Analytics
-
-- Health check: `GET /health`
-- API documentation: `GET /docs`
-- Analytics dashboard: `GET /api/analytics/dashboard`
-- Rate limiting status in response headers
-
----
-
-## 🚀 Production Checklist
-
-- [ ] Set `DEBUG=False` in environment
-- [ ] Use strong `SECRET_KEY`
-- [ ] Configure SSL certificates
-- [ ] Set up database backups
-- [ ] Configure monitoring (Sentry, etc.)
-- [ ] Set up log aggregation
-- [ ] Configure reverse proxy (nginx)
-- [ ] Set up CI/CD pipeline
-- [ ] Configure domain and DNS
-- [ ] Set up email service (SendGrid, etc.)
-- [ ] Configure payment webhooks
 
 ---
 
 ## 🆘 Troubleshooting
 
-### Common Issues
+**1. "Can't reach database server" / Prisma Errors**
+- Double-check the DB Connection String. If hosting on Supabase, ensure database access IP whitelist rules (if any) allow connections from Render/Vercel server hosts.
+- Verify that both `DATABASE_URL` (pooler) and `DIRECT_URL` (direct connection string for schema changes) are configured.
 
-**Backend won't start:**
-- Check database connection
-- Verify environment variables
-- Check logs: `docker-compose logs backend`
+**2. FastAPI AI Service Host Translation Errors**
+- If the AI microservice fails to resolve the database host name (e.g. `db.wzrphhppzfczkxxihyiy.supabase.co`), verify network connectivity to the database or DNS settings on the hosting platform.
 
-**Frontend build fails:**
-- Clear node_modules: `rm -rf node_modules && npm install`
-- Check Node.js version (18+)
-
-**Database connection issues:**
-- Ensure PostgreSQL is running
-- Check connection string in `.env`
-
-**WebSocket connections fail:**
-- Verify CORS settings
-- Check Socket.IO client configuration
-
----
-
-## 📞 Support
-
-For issues or questions:
-1. Check the logs: `docker-compose logs -f`
-2. Review API documentation: http://localhost:8000/docs
-3. Check environment variables
-4. Verify Docker network connectivity
-
----
-
-## 🎯 Next Steps
-
-1. **Configure production environment variables**
-2. **Set up SSL certificates**
-3. **Configure monitoring and alerting**
-4. **Set up automated backups**
-5. **Implement CI/CD pipeline**
-6. **Add more comprehensive tests**
-7. **Set up staging environment**
-
-The application is now ready for deployment! 🚀
-- PostgreSQL 15+
-- Node.js 18+
-
-### Steps
-
-```bash
-# 1. Create database
-createdb goflex_db
-createuser goflex_user
-
-# 2. Initialize schema
-psql goflex_db -f backend/database/schema.sql
-psql goflex_db -f backend/database/seed.sql
-
-# 3. Install dependencies
-cd backend
-npm install
-
-# 4. Configure environment
-cp .env.example .env
-# Edit .env with your values
-
-# 5. Start server
-npm run dev
-```
-
----
-
-## Environment Variables
-
-### Backend (.env)
-
-```env
-NODE_ENV=development
-PORT=5000
-CORS_ORIGIN=http://localhost:3000
-
-DB_HOST=postgres
-DB_PORT=5432
-DB_USER=goflex_user
-DB_PASSWORD=goflex_secure_password_123
-DB_NAME=goflex_db
-
-JWT_SECRET=your-secret-key-here
-
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-
-SENTRY_DSN=
-```
-
----
-
-## API Endpoints
-
-### Health Check
-```bash
-curl http://localhost:5000/health
-```
-
-### Authentication
-```bash
-POST /api/auth/register
-POST /api/auth/login
-GET /api/auth/profile
-PUT /api/auth/profile
-POST /api/auth/change-password
-```
-
-### Properties
-```bash
-GET /api/properties
-GET /api/properties/:id
-POST /api/properties
-PUT /api/properties/:id
-DELETE /api/properties/:id
-```
-
-### Bookings
-```bash
-POST /api/bookings
-GET /api/bookings/user/my-bookings
-GET /api/bookings/:id
-POST /api/bookings/:id/cancel
-PATCH /api/bookings/:id/status
-```
-
-### Payments
-```bash
-POST /api/payments/create-intent
-POST /api/payments/confirm
-GET /api/payments/history
-POST /api/payments/webhook
-```
-
-### Blog
-```bash
-GET /api/blog
-GET /api/blog/:slug
-POST /api/blog
-PUT /api/blog/:id
-DELETE /api/blog/:id
-```
-
-### Virtual Tours
-```bash
-GET /api/tours/property/:propertyId
-POST /api/tours
-PUT /api/tours/:id
-DELETE /api/tours/:id
-```
-
----
-
-## Production Deployment
-
-### Hosting Options
-
-1. **Netlify + Railway**
-   - Frontend: Netlify
-   - Backend: Railway
-   - Database: Railway PostgreSQL
-
-2. **Heroku**
-   - All-in-one platform
-   - Easy setup but higher cost
-
-3. **AWS**
-   - EC2 for backend
-   - RDS for database
-   - CloudFront for CDN
-   - Most control and flexibility
-
-4. **DigitalOcean**
-   - App Platform for backend
-   - Managed DB for PostgreSQL
-   - Cost-effective option
-
-### Pre-Deployment
-
-- [ ] Generate strong JWT_SECRET
-- [ ] Set up Stripe production keys
-- [ ] Configure Sentry DSN
-- [ ] Set up SSL certificates
-- [ ] Configure CORS for production domain
-- [ ] Test all payment flows
-- [ ] Set up database backups
-
----
-
-## Troubleshooting
-
-### Docker Issues
-```bash
-# Restart services
-docker-compose restart
-
-# Clean rebuild
-docker-compose down -v
-docker-compose up -d
-
-# View logs
-docker-compose logs -f backend
-```
-
-### Database Issues
-```bash
-# Reconnect to database
-docker-compose exec postgres psql -U goflex_user -d goflex_db
-
-# Backup database
-docker-compose exec postgres pg_dump -U goflex_user goflex_db > backup.sql
-
-# Restore database
-docker-compose exec postgres psql -U goflex_user goflex_db < backup.sql
-```
-
-### API Issues
-```bash
-# Test endpoint
-curl -H "Authorization: Bearer <token>" http://localhost:5000/api/users/dashboard/stats
-
-# Check logs
-docker-compose logs backend --tail=50
-```
-
----
-
-## Features Implemented
-
-✅ Docker PostgreSQL setup
-✅ Node.js/Express backend
-✅ Authentication (JWT)
-✅ Property management
-✅ Booking system
-✅ Stripe payment integration
-✅ Virtual tours
-✅ Blog/Content management
-✅ Resident dashboard
-✅ Brand enhancements
-✅ Sentry error monitoring
-
----
-
-**For more details, see the full documentation in this directory.**
+**3. CORS Blocking Errors**
+- Verify that `CORS_ORIGIN` in `backend/core` exactly matches the URL of your deployed frontend app (e.g. `https://goflex-housing.vercel.app`) without trailing slashes.

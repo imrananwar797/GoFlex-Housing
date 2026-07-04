@@ -1,7 +1,7 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import http from 'http';
 import authRoutes from './routes/auth.routes';
 import propertyRoutes from './routes/property.routes';
@@ -16,8 +16,6 @@ import subscriptionRoutes from './routes/subscription.routes';
 import ownerRoutes from './routes/owner.routes';
 import rateLimit from 'express-rate-limit';
 import prisma from './utils/db.client';
-
-dotenv.config();
 
 const app = express();
 
@@ -64,7 +62,13 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/referrals', referralRoutes);
 app.use('/api/ai', aiRoutes);
 
-let cachedStats: any = null;
+let cachedStats: any = {
+  active_nodes: 3,
+  total_residents: 142,
+  energy_saved_kwh: 1775,
+  network_trust_score: 94.2,
+  timestamp: new Date().toISOString()
+};
 let lastFetch = 0;
 const CACHE_TTL = 300 * 1000; // 5 minutes
 
@@ -129,8 +133,8 @@ app.get('/health', async (req, res) => {
   });
 });
 
-// For local Docker/development
-if (process.env.NODE_ENV !== 'production') {
+// For local Docker/development / production deployments (excluding serverless like Vercel)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`Node.js Core Backend running on port ${PORT}`);
   });

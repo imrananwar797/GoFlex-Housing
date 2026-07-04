@@ -1,0 +1,35 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "*.js",
+      "*.css",
+      "*.json",
+      "*.ico",
+      "*.png",
+      "*.svg",
+      "*.jpg",
+      "*.jpeg",
+      "*.gif",
+      "*.webp",
+      "*.map",
+      "*.woff",
+      "*.woff2",
+      "*.ttf",
+      "/assets/*.js",
+      "/assets/*.css",
+      "/assets/*.png",
+      "/assets/*.jpg",
+      "/assets/*.jpeg",
+      "/assets/*.gif",
+      "/assets/*.svg",
+      "/assets/*.ico",
+      "/assets/*.json",
+      "/assets/*.webp",
+      "/assets/*.woff",
+      "/assets/*.woff2",
+      "/assets/*.ttf",
+      "/assets/**/*"
+    ]
+  }
+}

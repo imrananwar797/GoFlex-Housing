@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "uvicorn main:app --reload --port 8001",
+    "dev": "node -e \"const fs = require('fs'); const spawn = require('child_process').spawn; const path = require('path'); const isWin = process.platform === 'win32'; const venvPath = isWin ? path.join('..', '..', '.venv', 'Scripts', 'uvicorn.exe') : path.join('..', '..', '.venv', 'bin', 'uvicorn'); const cmd = fs.existsSync(venvPath) ? venvPath : 'uvicorn'; const child = spawn(cmd, ['main:app', '--reload', '--port', '8001'], { stdio: 'inherit', shell: true }); child.on('exit', code => process.exit(code || 0));\"",
     "compile": "echo 'No build step for Python AI'"
   }
 }

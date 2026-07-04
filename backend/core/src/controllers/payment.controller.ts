@@ -31,17 +31,16 @@ export const initiatePayment = async (req: Request, res: Response) => {
         user_id,
         booking_id,
         amount,
-        method,
         status: 'pending',
-        transaction_id: `TXN_${Date.now()}_${Math.floor(Math.random() * 1000)}`
+        stripe_payment_id: `TXN_${Date.now()}_${Math.floor(Math.random() * 1000)}`
       }
     });
 
     res.json({
       transaction_id: transaction.id,
-      gateway_id: transaction.transaction_id,
+      gateway_id: transaction.stripe_payment_id,
       status: 'pending',
-      checkout_url: `https://goflex-checkout.com/pay/${transaction.transaction_id}`
+      checkout_url: `https://goflex-checkout.com/pay/${transaction.stripe_payment_id}`
     });
 
   } catch (error) {
@@ -55,7 +54,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
 
   try {
     const transaction = await prisma.paymentTransaction.update({
-      where: { transaction_id },
+      where: { stripe_payment_id: transaction_id },
       data: { status }
     });
 
@@ -67,11 +66,12 @@ export const handleWebhook = async (req: Request, res: Response) => {
       
       // Also initialize Escrow (Fintech logic)
       await prisma.escrowAccount.upsert({
-        where: { user_id: transaction.user_id },
-        update: { held_amount: { increment: transaction.amount } },
+        where: { booking_id: transaction.booking_id as number },
+        update: { amount_held: { increment: transaction.amount } },
         create: {
+          booking_id: transaction.booking_id as number,
           user_id: transaction.user_id,
-          held_amount: transaction.amount,
+          amount_held: transaction.amount,
           status: 'held'
         }
       });

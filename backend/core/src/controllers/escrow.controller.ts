@@ -5,7 +5,7 @@ export const getEscrowAccount = async (req: Request, res: Response) => {
   const { booking_id } = req.params;
   try {
     const account = await prisma.escrowAccount.findUnique({
-      where: { booking_id: parseInt(booking_id) },
+      where: { booking_id: parseInt(booking_id as string) },
       include: { booking: true }
     });
 
@@ -28,7 +28,7 @@ export const getEscrowStatus = async (req: Request, res: Response) => {
   const user_id = (req as any).user.user_id;
 
   try {
-    const escrow = await prisma.escrowAccount.findUnique({
+    const escrow = await prisma.escrowAccount.findFirst({
       where: { user_id }
     });
 
@@ -47,11 +47,11 @@ export const disputeEscrow = async (req: Request, res: Response) => {
   const { reason } = req.body;
 
   try {
-    const escrow = await prisma.escrowAccount.update({
+    const escrow = await prisma.escrowAccount.updateMany({
       where: { user_id },
       data: {
         status: 'disputed',
-        disputed_total: { increment: 1 } // Tracking number of disputes
+        dispute_reason: reason
       }
     });
 
@@ -69,12 +69,11 @@ export const releaseEscrow = async (req: Request, res: Response) => {
   const { resident_user_id } = req.body;
 
   try {
-    const escrow = await prisma.escrowAccount.update({
+    const escrow = await prisma.escrowAccount.updateMany({
       where: { user_id: resident_user_id },
       data: {
         status: 'active',
-        held_amount: 0,
-        balance: { decrement: 0 } // In a real app, transfer to owner balance
+        amount_held: 0
       }
     });
 

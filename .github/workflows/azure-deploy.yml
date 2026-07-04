@@ -1,0 +1,105 @@
+name: Deploy GoFlex Housing to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-frontend:
+    name: Deploy React Frontend to SWA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_SWA_DEPLOYMENT_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/apps/frontend"
+          output_location: "dist"
+
+  deploy-core-api:
+    name: Deploy Node.js Core Backend to ACA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to Azure Container Registry
+        run: |
+          az acr login --name ${{ secrets.AZURE_ACR_NAME }}
+
+      - name: Build and Push Core API Docker Image
+        run: |
+          REGISTRY_URL="${{ secrets.AZURE_ACR_NAME }}.azurecr.io"
+          IMAGE_NAME="goflex-core-api"
+          TAG="${{ github.sha }}"
+          
+          # Build and push using the backend/core folder as the context
+          docker build -t $REGISTRY_URL/$IMAGE_NAME:$TAG -f backend/core/Dockerfile backend/core
+          docker push $REGISTRY_URL/$IMAGE_NAME:$TAG
+          
+          # Also tag and push as latest
+          docker tag $REGISTRY_URL/$IMAGE_NAME:$TAG $REGISTRY_URL/$IMAGE_NAME:latest
+          docker push $REGISTRY_URL/$IMAGE_NAME:latest
+
+      - name: Deploy to Azure Container Apps
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          acrName: ${{ secrets.AZURE_ACR_NAME }}
+          containerAppName: goflex-core-api
+          resourceGroup: goflex-prod-rg
+          imageToDeploy: ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/goflex-core-api:${{ github.sha }}
+          targetPort: 5000
+
+  deploy-ai-api:
+    name: Deploy Python AI Backend to ACA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Log in to Azure Container Registry
+        run: |
+          az acr login --name ${{ secrets.AZURE_ACR_NAME }}
+
+      - name: Build and Push AI API Docker Image
+        run: |
+          REGISTRY_URL="${{ secrets.AZURE_ACR_NAME }}.azurecr.io"
+          IMAGE_NAME="goflex-ai-api"
+          TAG="${{ github.sha }}"
+          
+          # Build and push using the backend/ai folder as the context
+          docker build -t $REGISTRY_URL/$IMAGE_NAME:$TAG -f backend/ai/Dockerfile backend/ai
+          docker push $REGISTRY_URL/$IMAGE_NAME:$TAG
+          
+          # Also tag and push as latest
+          docker tag $REGISTRY_URL/$IMAGE_NAME:$TAG $REGISTRY_URL/$IMAGE_NAME:latest
+          docker push $REGISTRY_URL/$IMAGE_NAME:latest
+
+      - name: Deploy to Azure Container Apps
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          acrName: ${{ secrets.AZURE_ACR_NAME }}
+          containerAppName: goflex-ai-api
+          resourceGroup: goflex-prod-rg
+          imageToDeploy: ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/goflex-ai-api:${{ github.sha }}
+          targetPort: 8000

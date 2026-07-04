@@ -8,7 +8,7 @@ export const createBooking = async (req: Request, res: Response) => {
   try {
     const booking = await prisma.booking.create({
       data: {
-        user_id,
+        resident_id: user_id,
         property_id,
         check_in_date: new Date(check_in_date),
         check_out_date: new Date(check_out_date),
@@ -27,7 +27,7 @@ export const getMyBookings = async (req: Request, res: Response) => {
   const user_id = (req as any).user.user_id;
   try {
     const bookings = await prisma.booking.findMany({
-      where: { user_id },
+      where: { resident_id: user_id },
       include: { property: true }
     });
     res.json(bookings);

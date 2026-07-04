@@ -12,7 +12,6 @@ export const uploadKYCDocument = async (req: Request, res: Response) => {
       data: {
         user_id,
         document_type,
-        document_number,
         document_url,
         status: 'pending'
       }
