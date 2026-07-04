@@ -4,24 +4,21 @@ import { motion } from 'framer-motion';
 import PageTransition from '../components/common/PageTransition';
 import { Target, Eye, Lightbulb, Users, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 
-const teamMembers = [
+const seoAdvantages = [
   {
-    name: 'Priya Sharma',
-    role: 'Founder & CEO',
-    bio: 'Former real estate entrepreneur with 12+ years of experience in premium residential spaces',
-    image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
+    title: 'Zero Brokerage Co-Living Spaces',
+    subtitle: '100% Direct Rentals',
+    desc: 'Eliminate middlemen fees entirely. GoFlex offers direct listings of verified PG hostels, shared rooms, and co-living apartments with full pricing transparency and secure escrow-based deposit protection.',
   },
   {
-    name: 'Vikram Patel',
-    role: 'Chief Operations Officer',
-    bio: 'Operations expert with background in hospitality and community management',
-    image: 'https://images.pexels.com/photos/416782/pexels-photo-416782.jpeg',
+    title: 'DigiLocker & Aadhaar E-Sign Tenancies',
+    subtitle: 'Legally Binding Paperless Agreements',
+    desc: 'Secure your stay in minutes. By integrating government-backed Aadhaar and DigiLocker systems, we verify guest identities and execute digital rental agreements seamlessly without manual paperwork.',
   },
   {
-    name: 'Rajesh Kumar',
-    role: 'Head of Technology',
-    bio: 'Tech innovator specializing in IoT and smart building solutions',
-    image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+    title: 'Smart IoT Infrastructure & Utility Telemetry',
+    subtitle: 'Transparent Bill Tracking',
+    desc: 'Live smarter. Every GoFlex building features digital utilities tracking for electricity, water, and premium high-speed internet, feeding directly into your resident dashboard to avoid hidden charges.',
   },
 ];
 
@@ -118,30 +115,33 @@ export default function About() {
           </div>
         </section>
 
-        {/* Team Section */}
+        {/* Trust & SEO Advantages Section */}
         <section className="py-32">
           <div className="max-w-7xl mx-auto px-8">
             <div className="text-center mb-20">
-              <span className="section-eyebrow mb-6 justify-center">Leadership</span>
-              <h2 className="section-title">Meet Our Founders</h2>
+              <span className="section-eyebrow mb-6 justify-center">Ecosystem Advantages</span>
+              <h2 className="section-title">The GoFlex Tenancy Infrastructure</h2>
             </div>
             <div className="grid md:grid-cols-3 gap-12">
-              {teamMembers.map((member, i) => (
-                <motion.article 
-                  key={member.name}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="group"
-                >
-                  <div className="relative aspect-square overflow-hidden rounded-[40px] mb-8 glass-morphism border-white/5">
-                    <img src={member.image} alt={member.name} className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" />
-                  </div>
-                  <h3 className="text-2xl font-black mb-2 group-hover:text-neon-blue transition-colors">{member.name}</h3>
-                  <p className="text-neon-blue text-[10px] font-black uppercase tracking-widest mb-4">{member.role}</p>
-                  <p className="text-slate-400 text-sm leading-relaxed">{member.bio}</p>
-                </motion.article>
-              ))}
+              {seoAdvantages.map((adv, i) => {
+                const IconComponent = i === 0 ? ShieldCheck : i === 1 ? Zap : Lightbulb;
+                return (
+                  <motion.article 
+                    key={adv.title}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="glass-morphism p-10 rounded-[40px] border-white/5 hover:border-white/10 hover:translate-y-[-4px] transition-all duration-300"
+                  >
+                    <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mb-8 border border-white/10 text-neon-blue">
+                      <IconComponent size={24} />
+                    </div>
+                    <h3 className="text-2xl font-black mb-2 text-white">{adv.title}</h3>
+                    <p className="text-neon-blue text-[10px] font-black uppercase tracking-widest mb-4">{adv.subtitle}</p>
+                    <p className="text-slate-400 text-sm leading-relaxed">{adv.desc}</p>
+                  </motion.article>
+                );
+              })}
             </div>
           </div>
         </section>
