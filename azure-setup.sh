@@ -11,6 +11,9 @@ RESOURCE_GROUP="GoFlex-Housing"
 LOCATION="eastus"
 ACR_NAME="goflexregistry"
 ACA_ENV="goflex-managed-env"
+DB_SERVER_NAME="goflex-db-server"
+DB_USER="goflex_admin"
+DB_PASS="GoFlexSecureDbPass2026!"
 
 echo "=========================================================="
 echo " Starting GoFlex Housing Azure Setup & Provisioning"
@@ -40,6 +43,21 @@ az containerapp env create \
   --resource-group "$RESOURCE_GROUP" \
   --location "$LOCATION"
 
+# 5. Create Azure Database for PostgreSQL (Flexible Server)
+echo "--> Creating Azure Database for PostgreSQL Flexible Server '$DB_SERVER_NAME'..."
+az postgres flexible-server create \
+  --resource-group "$RESOURCE_GROUP" \
+  --name "$DB_SERVER_NAME" \
+  --location "$LOCATION" \
+  --admin-user "$DB_USER" \
+  --admin-password "$DB_PASS" \
+  --sku-name Standard_B1ms \
+  --tier Burstable \
+  --public-access all \
+  --yes
+
 echo "=========================================================="
 echo " Azure Setup Complete! Foundational Workspace Ready."
+echo " Database Server: $DB_SERVER_NAME.postgres.database.azure.com"
+echo " Database Admin: $DB_USER"
 echo "=========================================================="

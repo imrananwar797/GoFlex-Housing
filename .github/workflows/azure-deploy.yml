@@ -27,7 +27,7 @@ jobs:
           output_location: "dist"
 
   deploy-core-api:
-    name: Deploy Node.js Core Backend to ACA
+    name: Deploy Node.js Core Backend to App Service
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -56,14 +56,11 @@ jobs:
           docker tag $REGISTRY_URL/$IMAGE_NAME:$TAG $REGISTRY_URL/$IMAGE_NAME:latest
           docker push $REGISTRY_URL/$IMAGE_NAME:latest
 
-      - name: Deploy to Azure Container Apps
-        uses: azure/container-apps-deploy-action@v1
+      - name: Deploy to Azure Web App (App Service)
+        uses: azure/webapps-deploy@v3
         with:
-          acrName: ${{ secrets.AZURE_ACR_NAME }}
-          containerAppName: goflex-core-api
-          resourceGroup: GoFlex-Housing
-          imageToDeploy: ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/goflex-core-api:${{ github.sha }}
-          targetPort: 5000
+          app-name: GoFlex-Housing
+          images: ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/goflex-core-api:${{ github.sha }}
 
   deploy-ai-api:
     name: Deploy Python AI Backend to ACA
