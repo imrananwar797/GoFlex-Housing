@@ -7,7 +7,7 @@ set -euo pipefail
 export PATH=$PATH:"/c/Program Files/Microsoft SDKs/Azure/CLI2/wbin":"/c/Program Files (x86)/Microsoft SDKs/Azure/CLI2/wbin"
 
 # Define operational variables
-RESOURCE_GROUP="goflex-prod-rg"
+RESOURCE_GROUP="GoFlex-Housing"
 LOCATION="eastus"
 ACR_NAME="goflexregistry"
 ACA_ENV="goflex-managed-env"
