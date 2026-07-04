@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../auth/AuthContext';
@@ -8,7 +8,7 @@ import PageTransition from '../components/common/PageTransition';
 import { LogIn, ShieldCheck, User, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
-  const { login, loginWithGoogle } = useAuth();
+  const { user, login, loginWithGoogle } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<Role>('resident');
@@ -20,6 +20,17 @@ export default function Login() {
   const [otp, setOtp] = useState('');
   const [tempToken, setTempToken] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      const redirectPath = user.role === 'owner' 
+        ? '/owner/dashboard' 
+        : user.role === 'admin' 
+        ? '/admin/dashboard' 
+        : '/resident/dashboard';
+      nav(redirectPath, { replace: true, state: { from: location.state?.from } });
+    }
+  }, [user, nav, location]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
