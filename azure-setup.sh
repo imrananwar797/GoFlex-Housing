@@ -3,6 +3,9 @@
 # GoFlex Housing Azure Foundations Setup Automation
 set -euo pipefail
 
+# Ensure Azure CLI wbin paths are included in the PATH for Git Bash/MINGW environment
+export PATH=$PATH:"/c/Program Files/Microsoft SDKs/Azure/CLI2/wbin":"/c/Program Files (x86)/Microsoft SDKs/Azure/CLI2/wbin"
+
 # Define operational variables
 RESOURCE_GROUP="goflex-prod-rg"
 LOCATION="eastus"
