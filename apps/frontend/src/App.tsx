@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Mail, Phone, ShieldCheck, Github, Twitter, Linkedin } from 'lucide-react';
 import { Home, Placeholder, Team } from './pages';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import RequireAuth from './components/auth/RequireAuth';
@@ -178,78 +178,77 @@ export default function App() {
       <AuthProvider>
         <div className={isDashboard ? "app-shell is-dash" : "app-shell"}>
           {!isDashboard && (
-            <header className="site-header">
-              <nav className="nav-bar">
-                <div className="nav-section-left">
-                  <NavLink to="/" className="brand-link">
-                    GoFlex <span className="text-neon-blue ml-2">Housing</span>
+            <header className="site-header w-full px-4 md:px-8">
+              <nav className="nav-bar bg-[#080A0E]/80 backdrop-blur-md border border-white/10 rounded-full px-6 py-3 flex items-center justify-between shadow-2xl">
+                <div className="flex items-center gap-2">
+                  <NavLink to="/" className="text-white font-black text-lg tracking-tighter uppercase flex items-center gap-1.5">
+                    GoFlex <span className="text-neon-blue font-light">Housing</span>
                   </NavLink>
                 </div>
 
-                <div className="nav-section-center hidden-mobile">
-                  <div className="nav-links">
-                    {mainNav.map((n) => (
-                      <NavLink
-                        key={n.to}
-                        to={n.to}
-                        className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-                      >
-                        {n.label}
-                      </NavLink>
-                    ))}
-                    <div className="nav-dropdown-trigger group relative">
-                      <button className="nav-link flex items-center gap-1">
-                        More
-                        <svg className="w-3 h-3 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                        <div className="bg-[#0B0E14] border border-white/10 rounded-2xl p-2 shadow-2xl min-w-[160px] backdrop-blur-xl">
-                          {secondaryNav.map((n) => (
-                            <NavLink
-                              key={n.to}
-                              to={n.to}
-                              className="block px-4 py-2 text-[12px] font-bold text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                            >
-                              {n.label}
-                            </NavLink>
-                          ))}
-                        </div>
+                {/* Desktop Nav links (Hidden on mobile and tablet) */}
+                <div className="hidden lg:flex items-center gap-2 bg-white/5 p-1 rounded-full border border-white/5">
+                  {mainNav.map((n) => (
+                    <NavLink
+                      key={n.to}
+                      to={n.to}
+                      className={({ isActive }) => (isActive ? 'px-4 py-2 bg-neon-blue/20 text-neon-blue rounded-full text-xs font-black uppercase tracking-wider transition-all' : 'px-4 py-2 text-slate-400 hover:text-white rounded-full text-xs font-black uppercase tracking-wider transition-all')}
+                    >
+                      {n.label}
+                    </NavLink>
+                  ))}
+                  <div className="relative group">
+                    <button className="px-4 py-2 text-slate-400 hover:text-white rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-1">
+                      More ▾
+                    </button>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                      <div className="bg-[#0B0E14] border border-white/10 rounded-2xl p-2 shadow-2xl min-w-[160px] backdrop-blur-xl">
+                        {secondaryNav.map((n) => (
+                          <NavLink
+                            key={n.to}
+                            to={n.to}
+                            className="block px-4 py-2.5 text-[11px] font-black text-slate-400 hover:text-white hover:bg-white/5 rounded-xl uppercase tracking-wider transition-all"
+                          >
+                            {n.label}
+                          </NavLink>
+                        ))}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="nav-section-right">
-                  <div className="hidden-mobile flex items-center gap-4">
+                <div className="flex items-center gap-4">
+                  {/* Location Picker (Hidden on mobile) */}
+                  <div className="hidden sm:block">
                     <NavLocationPicker />
                   </div>
-                  <div className="nav-actions">
-                    <div className="relative group hidden-mobile">
-                      <input 
-                        type="text" 
-                        className="nav-search-pill" 
-                        placeholder="Search..." 
-                      />
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none group-focus-within:text-neon-blue transition-colors">
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                      </div>
+                  
+                  {/* Search Bar (Hidden on mobile) */}
+                  <div className="relative hidden md:block">
+                    <input 
+                      type="text" 
+                      className="bg-white/5 border border-white/10 rounded-full py-2 pl-4 pr-10 text-xs text-white outline-none focus:border-neon-blue/50 focus:w-44 w-32 transition-all" 
+                      placeholder="Search..." 
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
                     </div>
-                    
-                    <div className="hidden-mobile">
-                      <NavAuthActions />
-                    </div>
-
-                    <button 
-                      className="only-mobile p-2 text-white hover:bg-white/5 rounded-full"
-                      onClick={() => setIsMobileMenuOpen(true)}
-                    >
-                      <Menu size={24} />
-                    </button>
                   </div>
+
+                  {/* Auth Actions / Dashboard links (Hidden on mobile) */}
+                  <div className="hidden sm:block">
+                    <NavAuthActions />
+                  </div>
+
+                  {/* Mobile Menu trigger (Visible on mobile/tablet) */}
+                  <button 
+                    className="lg:hidden p-2.5 bg-white/5 border border-white/10 text-white rounded-full hover:bg-white/10 transition-all"
+                    onClick={() => setIsMobileMenuOpen(true)}
+                  >
+                    <Menu size={18} />
+                  </button>
                 </div>
               </nav>
             </header>
@@ -258,37 +257,56 @@ export default function App() {
           <AnimatePresence>
             {isMobileMenuOpen && (
               <motion.div 
-                initial={{ opacity: 0, x: '100%' }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: '100%' }}
-                className="mobile-menu-overlay"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-md z-[2000] flex justify-end"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                <div className="flex justify-between items-center">
-                  <span className="brand-link p-0">
-                    GoFlex <span className="text-neon-blue ml-2">Housing</span>
-                  </span>
-                  <button 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="p-2 text-white"
-                  >
-                    <X size={32} />
-                  </button>
-                </div>
+                <motion.div 
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100%' }}
+                  transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                  className="w-full max-w-sm h-full bg-[#0B0E14] border-l border-white/10 p-8 flex flex-col justify-between shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="space-y-8">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white font-black text-lg tracking-tighter uppercase">
+                        GoFlex <span className="text-neon-blue font-light">Menu</span>
+                      </span>
+                      <button 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="p-2 text-slate-500 hover:text-white rounded-xl hover:bg-white/5 transition-all"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
 
-                <div className="mobile-menu-content">
-                  {[...mainNav, ...secondaryNav].map((n) => (
-                    <NavLink
-                      key={n.to}
-                      to={n.to}
-                      className={({ isActive }) => isActive ? "mobile-nav-link active" : "mobile-nav-link"}
-                    >
-                      {n.label}
-                    </NavLink>
-                  ))}
-                  <div className="pt-8 border-t border-white/10 mt-8">
-                     <NavAuthActions />
+                    <div className="flex flex-col gap-1">
+                      {[...mainNav, ...secondaryNav].map((n) => (
+                        <NavLink
+                          key={n.to}
+                          to={n.to}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={({ isActive }) => isActive 
+                            ? "px-4 py-3 bg-neon-blue/10 text-neon-blue rounded-xl text-sm font-black uppercase tracking-wider transition-all" 
+                            : "px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl text-sm font-black uppercase tracking-wider transition-all"}
+                        >
+                          {n.label}
+                        </NavLink>
+                      ))}
+                    </div>
                   </div>
-                </div>
+
+                  <div className="pt-6 border-t border-white/10 space-y-4">
+                    <div className="sm:hidden block">
+                      <NavLocationPicker />
+                    </div>
+                    <NavAuthActions />
+                  </div>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -362,40 +380,93 @@ export default function App() {
           {!isDashboard && <HelpFab />}
           <AIConcierge />
           {!isDashboard && (
-            <footer className="site-footer">
-              <div className="footer-inner">
-                <div className="footer-branding">
-                  <NavLink to="/" className="footer-brand-link" aria-label="GoFlex Housing home">
-                    <img className="footer-brand-logo" src="https://cdn.builder.io/api/v1/image/assets%2Fd6633193bc9341db92fc7ba045098b86%2F7a5b4b23ef0b413783eb1f928bffc680?format=webp&width=800" alt="GoFlex Housing logo" />
-                    <span className="footer-brand-text">GoFlex Housing</span>
+            <footer className="bg-[#080A0E] border-t border-white/10 pt-20 pb-10 mt-auto text-slate-400 font-semibold text-xs">
+              <div className="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16">
+                
+                {/* Branding & Socials */}
+                <div className="lg:col-span-4 space-y-6">
+                  <NavLink to="/" className="text-white font-black text-xl tracking-tighter uppercase flex items-center gap-1.5">
+                    GoFlex <span className="text-neon-blue font-light">Housing</span>
                   </NavLink>
-                  <p className="footer-summary">Flexible co-living spaces curated for modern professionals across thriving cities.</p>
+                  <p className="text-slate-500 leading-relaxed max-w-sm">
+                    GoFlex is the operating system for modern rental housing. Curating premium, fully-serviced sanctuaries for high-performance builders.
+                  </p>
+                  
+                  {/* Social Icons */}
+                  <div className="flex gap-4">
+                    {[
+                      { icon: Twitter, href: 'https://twitter.com/goflex' },
+                      { icon: Linkedin, href: 'https://linkedin.com/company/goflex' },
+                      { icon: Github, href: 'https://github.com/goflex' }
+                    ].map((item, idx) => (
+                      <a key={idx} href={item.href} target="_blank" rel="noopener noreferrer" 
+                        className="p-2.5 bg-white/5 border border-white/10 hover:border-neon-blue/30 text-slate-400 hover:text-neon-blue rounded-xl transition-all">
+                        <item.icon size={16} />
+                      </a>
+                    ))}
+                  </div>
+
+                  {/* Verification stamps */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <span className="flex items-center gap-1 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg text-[9px] font-black uppercase tracking-wider">
+                      <ShieldCheck size={10} /> DigiLocker Verified
+                    </span>
+                    <span className="flex items-center gap-1 px-2.5 py-1 bg-neon-blue/10 border border-neon-blue/20 text-neon-blue rounded-lg text-[9px] font-black uppercase tracking-wider">
+                      ISO 27001 Secure
+                    </span>
+                  </div>
                 </div>
-                <div className="footer-column">
-                  <h3 className="footer-heading">Explore</h3>
-                  <NavLink to="/properties" className="footer-link">Properties</NavLink>
-                  <NavLink to="/gallery" className="footer-link">Gallery</NavLink>
-                  <NavLink to="/locations" className="footer-link">Locations</NavLink>
-                  <NavLink to="/blog" className="footer-link">Blog</NavLink>
-                  <NavLink to="/amenities" className="footer-link">Amenities</NavLink>
+
+                {/* Explore Links */}
+                <div className="lg:col-span-2 space-y-4">
+                  <h4 className="text-white font-black text-[10px] uppercase tracking-widest">Explore</h4>
+                  <div className="flex flex-col gap-2.5">
+                    <NavLink to="/properties" className="hover:text-white transition-colors">Nodes & Properties</NavLink>
+                    <NavLink to="/locations" className="hover:text-white transition-colors">Locations Matrix</NavLink>
+                    <NavLink to="/amenities" className="hover:text-white transition-colors">Amenities Index</NavLink>
+                    <NavLink to="/gallery" className="hover:text-white transition-colors">Visual Poetry</NavLink>
+                    <NavLink to="/blog" className="hover:text-white transition-colors">Community Blog</NavLink>
+                  </div>
                 </div>
-                <div className="footer-column">
-                  <h3 className="footer-heading">Company</h3>
-                  <NavLink to="/about" className="footer-link">About</NavLink>
-                  <NavLink to="/community" className="footer-link">Community</NavLink>
-                  <NavLink to="/documents" className="footer-link">Documents</NavLink>
-                  <NavLink to="/terms" className="footer-link">Terms</NavLink>
+
+                {/* Portals / Ecosystem */}
+                <div className="lg:col-span-3 space-y-4">
+                  <h4 className="text-white font-black text-[10px] uppercase tracking-widest">Ecosystem Portals</h4>
+                  <div className="flex flex-col gap-2.5">
+                    <NavLink to="/login" className="hover:text-white transition-colors">Resident Companion Portal</NavLink>
+                    <NavLink to="/login" className="hover:text-white transition-colors">Owner SaaS Console</NavLink>
+                    <NavLink to="/register" className="hover:text-white transition-colors">B2B Partner Program</NavLink>
+                    <NavLink to="/about" className="hover:text-white transition-colors">Developer Platform APIs</NavLink>
+                  </div>
                 </div>
-                <div className="footer-column">
-                  <h3 className="footer-heading">Support</h3>
-                  <NavLink to="/contact" className="footer-link">Contact</NavLink>
-                  <NavLink to="/team" className="footer-link">Our Team</NavLink>
-                  <NavLink to="/login" className="footer-link">Resident Portal</NavLink>
-                  <NavLink to="/register" className="footer-link">Join GoFlex</NavLink>
+
+                {/* Support & Contact */}
+                <div className="lg:col-span-3 space-y-4">
+                  <h4 className="text-white font-black text-[10px] uppercase tracking-widest">Support & Trust</h4>
+                  <div className="flex flex-col gap-2.5">
+                    <span className="flex items-center gap-2 hover:text-white transition-all">
+                      <Mail size={14} className="text-neon-blue shrink-0" /> support@goflex.co
+                    </span>
+                    <span className="flex items-center gap-2 hover:text-white transition-all">
+                      <Phone size={14} className="text-neon-blue shrink-0" /> +91 (80) 4920-4011
+                    </span>
+                    <NavLink to="/contact" className="hover:text-white transition-colors">Open Helpdesk Ticket</NavLink>
+                    <NavLink to="/team" className="hover:text-white transition-colors">Core Engineering Team</NavLink>
+                  </div>
                 </div>
+
               </div>
-              <div className="footer-meta">
-                <span className="footer-copy">© {new Date().getFullYear()} GoFlex Housing. All rights reserved.</span>
+
+              {/* Bottom Metadata bar */}
+              <div className="max-w-7xl mx-auto px-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-center">
+                <p className="text-slate-600 text-[10px] font-bold">
+                  © {new Date().getFullYear()} GoFlex Housing Technologies. All payments processed via secure bank-grade escrows.
+                </p>
+                <div className="flex items-center gap-4 text-slate-500 text-[10px] font-black uppercase tracking-wider">
+                  <NavLink to="/terms" className="hover:text-white transition-colors">Terms of Service</NavLink>
+                  <span>·</span>
+                  <NavLink to="/about" className="hover:text-white transition-colors">Privacy Protocol</NavLink>
+                </div>
               </div>
             </footer>
           )}
