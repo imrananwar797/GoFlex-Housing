@@ -22,11 +22,9 @@
   ],
   "functions": {
     "api/core.ts": {
-      "memory": 1024,
       "maxDuration": 15
     },
     "api/ai.py": {
-      "memory": 1024,
       "maxDuration": 20
     }
   }
