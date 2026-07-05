@@ -44,6 +44,7 @@
         "SUPABASE_PUBLISHABLE_KEY",
         "POSTGRES_USER",
         "SUPABASE_JWT_SECRET",
+        "JWT_SECRET",
         "SUPABASE_URL",
         "VITE_SUPABASE_URL",
         "VITE_SUPABASE_ANON_KEY"
