@@ -23,12 +23,16 @@ import prisma from './utils/db.client';
 
 const app = express();
 
+// Trust proxy for Vercel/reverse proxy environments
+app.set('trust proxy', 1);
+
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100, // Limit each IP to 100 requests per 15 minutes
   message: { detail: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false }
 });
 
 const loginLimiter = rateLimit({
@@ -37,6 +41,7 @@ const loginLimiter = rateLimit({
   message: { detail: 'Too many login attempts, please try again after 15 minutes' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false }
 });
 
 app.use('/api', apiLimiter);
