@@ -15,8 +15,8 @@
     "dev:frontend": "npm run dev --workspace=apps/frontend",
     "dev:core": "npm run dev --workspace=backend/core",
     "dev:ai": "npm run dev --workspace=backend/ai",
-    "build": "turbo run build --filter=frontend",
-    "vercel-build": "turbo run build --filter=frontend",
+    "build": "prisma generate --schema=backend/core/prisma/schema.prisma && turbo run build --filter=frontend",
+    "vercel-build": "prisma generate --schema=backend/core/prisma/schema.prisma && turbo run build --filter=frontend",
     "lint": "turbo run lint"
   },
   "devDependencies": {
