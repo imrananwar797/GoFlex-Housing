@@ -10,7 +10,7 @@ dist
 # Since api/ now ONLY contains core.ts and ai.py, we are good.
 
 # But let's ignore non-essential backend stuff
-backend/core/prisma
+# backend/core/prisma - keep for prisma generate
 backend/ai/tests
 backend/ai/venv
 backend/ai/logs
