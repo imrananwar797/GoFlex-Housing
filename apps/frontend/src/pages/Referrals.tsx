@@ -7,7 +7,7 @@ const Referrals: React.FC = () => {
     <DashboardLayout
       title="Referral Program"
       nav={[
-        { to: '/dashboard', label: 'Dashboard' },
+        { to: '/resident/dashboard', label: 'Dashboard' },
         { to: '/referrals', label: 'Refer & Earn' },
       ]}
     >

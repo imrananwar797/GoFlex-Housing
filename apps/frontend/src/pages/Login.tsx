@@ -42,7 +42,12 @@ export default function Login() {
         setShow2FA(true);
         setTempToken(response.temp_token);
       } else {
-        const redirectPath = role === 'owner' ? '/owner/dashboard' : '/dashboard';
+        const userRole = response.user.role.toLowerCase();
+        const redirectPath = userRole === 'owner' 
+          ? '/owner/dashboard' 
+          : userRole === 'admin' 
+          ? '/admin/dashboard' 
+          : '/resident/dashboard';
         nav(redirectPath, { replace: true, state: { from: location.state?.from } });
       }
     } catch (err: any) {
@@ -57,9 +62,24 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      await securityService.validateLogin2FA(otp, tempToken);
-      const redirectPath = role === 'owner' ? '/owner/dashboard' : '/dashboard';
-      window.location.href = redirectPath;
+      const res = await securityService.validateLogin2FA(otp, tempToken);
+      if (res.access_token) {
+        const authUser = {
+          id: res.user.id,
+          username: res.user.username,
+          email: res.user.email,
+          role: res.user.role.toLowerCase(),
+          token: res.access_token
+        };
+        localStorage.setItem('goflex_auth_v1', JSON.stringify(authUser));
+        const userRole = res.user.role.toLowerCase();
+        const redirectPath = userRole === 'owner' 
+          ? '/owner/dashboard' 
+          : userRole === 'admin' 
+          ? '/admin/dashboard' 
+          : '/resident/dashboard';
+        window.location.href = redirectPath;
+      }
     } catch (err: any) {
       setError('Invalid 2FA code');
     } finally {

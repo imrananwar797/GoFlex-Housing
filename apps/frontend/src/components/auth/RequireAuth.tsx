@@ -7,6 +7,14 @@ export default function RequireAuth({ role, children }: { role?: Role; children:
   const { user } = useAuth();
   const location = useLocation();
   if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
-  if (role && user.role.toLowerCase() !== role.toLowerCase()) return <Navigate to={user.role.toLowerCase() === 'admin' ? '/dashboard-admin' : '/dashboard'} replace />;
+  if (role && user.role.toLowerCase() !== role.toLowerCase()) {
+    const roleLower = user.role.toLowerCase();
+    const fallbackPath = roleLower === 'admin' 
+      ? '/admin/dashboard' 
+      : roleLower === 'owner' 
+      ? '/owner/dashboard' 
+      : '/resident/dashboard';
+    return <Navigate to={fallbackPath} replace />;
+  }
   return <>{children}</>;
 }

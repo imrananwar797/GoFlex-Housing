@@ -9,7 +9,7 @@ const TILES = [
     stat: 'You saved 12% energy this week.',
     icon: <Zap className="text-amber-400" />,
     color: 'border-amber-400/20',
-    link: '/dashboard'
+    link: '/resident/dashboard'
   },
   {
     title: 'Biometric Key',

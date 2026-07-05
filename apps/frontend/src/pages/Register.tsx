@@ -24,7 +24,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register({ ...form, role });
-      const redirectPath = role === 'admin' ? '/admin/dashboard' : role === 'owner' ? '/owner/dashboard' : '/dashboard';
+      const redirectPath = role === 'admin' ? '/admin/dashboard' : role === 'owner' ? '/owner/dashboard' : '/resident/dashboard';
       nav(redirectPath, { replace: true });
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed. Please check your information.');
