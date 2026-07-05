@@ -12,12 +12,8 @@
       "destination": "/api/ai.py"
     },
     {
-      "source": "/assets/:path*",
-      "destination": "/apps/frontend/dist/assets/:path*"
-    },
-    {
-      "source": "/((?!api/|assets/).*)",
-      "destination": "/apps/frontend/dist/index.html"
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ],
   "functions": {
