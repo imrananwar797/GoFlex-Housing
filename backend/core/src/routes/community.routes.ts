@@ -1,9 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/db.client';
 import { authenticateJWT } from '../middleware/auth.middleware';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // GET /api/community?property_id=X — get posts for a property
 router.get('/', authenticateJWT, async (req: Request, res: Response) => {

@@ -79,3 +79,7 @@ supabase/
 .vercel
 
 .env*.local
+
+# Prisma engines
+*.node
+query_engine-*

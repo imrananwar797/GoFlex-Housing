@@ -1,9 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/db.client';
 import { authenticateJWT } from '../middleware/auth.middleware';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 const SERVICE_CATALOGUE = [
   { id: 'cleaning', label: 'House Cleaning', icon: '🧹', price_from: 299, turnaround: '2-4 hrs' },

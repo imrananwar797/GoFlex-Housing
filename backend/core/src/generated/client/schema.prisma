@@ -1,0 +1,488 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  RESIDENT
+  OWNER
+  STAFF
+}
+
+enum userrole {
+  ADMIN
+  RESIDENT
+  OWNER
+  STAFF
+}
+
+model User {
+  id                 Int       @id @default(autoincrement())
+  username           String    @unique(map: "ix_users_username") @db.VarChar(255)
+  email              String    @unique(map: "ix_users_email") @db.VarChar(255)
+  full_name          String?   @db.VarChar(255)
+  phone              String?   @db.VarChar(20)
+  password_hash      String    @map("hashed_password") @db.VarChar(255)
+  role               userrole  @default(RESIDENT)
+  two_factor_enabled Boolean?  @default(false)
+  two_factor_secret  String?   @db.VarChar(255)
+  referral_code      String?   @unique(map: "ix_users_referral_code") @db.VarChar(255)
+  referred_by        String?   @db.VarChar(255)
+  created_at         DateTime? @default(now()) @db.Timestamp(6)
+  updated_at         DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  bookings            Booking[]            @relation("ResidentBookings")
+  payments            PaymentTransaction[]
+  kyc                 KYC?                 @relation("UserKYC")
+  escrow_accounts     EscrowAccount[]
+  fraud_alerts        FraudAlert[]
+  reviews             Review[]
+  messages            Message[]
+  notifications       Notification[]
+  subscriptions       Subscription[]
+  blog_posts          BlogPost[]
+  owned_properties    Property[]           @relation("OwnerProperties")
+  complaints          Complaint[]          @relation("ResidentComplaints")
+  visitor_logs        VisitorLog[]         @relation("ResidentVisitors")
+  resident_agreements RentalAgreement[]    @relation("ResidentAgreements")
+  owner_agreements    RentalAgreement[]    @relation("OwnerAgreements")
+  goflex_score        GoFlexScore?
+  community_posts     CommunityPost[]      @relation("AuthoredPosts")
+  service_requests    ServiceRequest[]     @relation("ResidentServices")
+
+  @@map("users")
+}
+
+model Property {
+  id              Int       @id @default(autoincrement())
+  owner_id        Int?
+  name            String    @db.VarChar(255)
+  description     String?
+  city            String    @db.VarChar(100)
+  state           String?   @db.VarChar(100)
+  state_iso       String?   @db.VarChar(2)
+  address         String?   @db.VarChar(500)
+  beds            Int?
+  baths           Int?
+  rent            Float     @map("monthly_price")
+  occupancy       Float?    @default(0)
+  amenities       Json?     @db.Json
+  featured_image  String?   @db.VarChar(500)
+  cover_image_url String?   @db.VarChar(500)
+  verified        Boolean?  @default(false)
+  active          Boolean?  @default(true)
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+  updated_at      DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  owner            User?             @relation("OwnerProperties", fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  bookings         Booking[]
+  reviews          Review[]
+  photos           PropertyPhoto[]
+  rooms            Room[]
+  complaints       Complaint[]
+  visitor_logs     VisitorLog[]
+  agreements       RentalAgreement[]
+  community_posts  CommunityPost[]
+  service_requests ServiceRequest[]
+  utilities        UtilityReading[]
+
+  @@map("properties")
+}
+
+model Booking {
+  id             Int       @id @default(autoincrement())
+  property_id    Int?
+  resident_id    Int?      @map("resident_id")
+  room_id        Int?
+  check_in_date  DateTime  @db.Timestamp(6)
+  check_out_date DateTime  @db.Timestamp(6)
+  total_guests   Int?      @default(1)
+  total_amount   Float
+  status         String?   @default("pending") @db.VarChar(50)
+  payment_status String?   @default("pending") @db.VarChar(50)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  property             Property?            @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  resident             User?                @relation("ResidentBookings", fields: [resident_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  room                 Room?                @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  escrow_accounts      EscrowAccount?
+  fraud_alerts         FraudAlert[]
+  payment_transactions PaymentTransaction[]
+
+  @@map("bookings")
+}
+
+model PaymentTransaction {
+  id                Int       @id @default(autoincrement())
+  booking_id        Int?
+  user_id           Int?      @map("user_id")
+  stripe_payment_id String?   @unique(map: "ix_payment_transactions_stripe_payment_id") @db.VarChar(255)
+  amount            Float
+  currency          String?   @default("INR") @db.VarChar(10)
+  status            String?   @default("pending") @db.VarChar(50)
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+  updated_at        DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  booking Booking? @relation(fields: [booking_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user    User?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("payment_transactions")
+}
+
+model EscrowAccount {
+  id             Int       @id @default(autoincrement())
+  booking_id     Int?      @unique(map: "ix_escrow_accounts_booking_id")
+  user_id        Int?      @map("user_id")
+  amount_held    Float     @map("amount_held")
+  status         String?   @default("active") @db.VarChar(50)
+  release_date   DateTime? @db.Timestamp(6)
+  dispute_reason String?
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  booking Booking? @relation(fields: [booking_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user    User?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("escrow_accounts")
+}
+
+model FraudAlert {
+  id          Int       @id @default(autoincrement())
+  user_id     Int?
+  booking_id  Int?
+  severity    String?   @db.VarChar(50)
+  alert_type  String    @db.VarChar(100)
+  description String
+  status      String?   @default("pending") @db.VarChar(50)
+  score       Float?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+
+  booking Booking? @relation(fields: [booking_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user    User?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("fraud_alerts")
+}
+
+model KYC {
+  id            Int       @id @default(autoincrement())
+  user_id       Int?      @unique
+  document_type String    @db.VarChar(50)
+  document_url  String    @map("file_path") @db.VarChar(500)
+  status        String?   @default("pending") @db.VarChar(50)
+  reviewed_by   Int?
+  review_notes  String?
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @default(now()) @db.Timestamp(6)
+
+  user User? @relation("UserKYC", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("kyc_documents")
+}
+
+model Review {
+  id          Int       @id @default(autoincrement())
+  property_id Int?
+  user_id     Int?
+  rating      Float
+  comment     String?
+  is_featured Boolean?  @default(false)
+  status      String?   @default("published") @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+
+  property Property? @relation(fields: [property_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user     User?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("reviews")
+}
+
+model Message {
+  id         Int       @id @default(autoincrement())
+  sender_id  Int
+  content    String
+  is_read    Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+
+  user User @relation(fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("messages")
+}
+
+model Notification {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  type       String    @db.VarChar(50)
+  title      String    @db.VarChar(255)
+  message    String?   @map("body")
+  read       Boolean?  @default(false) @map("is_read")
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("notifications")
+}
+
+model SubscriptionPlan {
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(100)
+  description   String?
+  price         Float
+  interval      String?        @default("month") @db.VarChar(20)
+  features      Json?          @db.Json
+  active        Boolean?       @default(true)
+  created_at    DateTime?      @default(now()) @db.Timestamp(6)
+  subscriptions Subscription[]
+
+  @@map("subscription_plans")
+}
+
+model Subscription {
+  id                     Int       @id @default(autoincrement())
+  user_id                Int?
+  plan_id                Int?
+  stripe_subscription_id String?   @unique(map: "ix_subscriptions_stripe_subscription_id") @db.VarChar(255)
+  status                 String?   @default("active") @db.VarChar(50)
+  current_period_start   DateTime? @db.Timestamp(6)
+  current_period_end     DateTime? @db.Timestamp(6)
+  created_at             DateTime? @default(now()) @db.Timestamp(6)
+  updated_at             DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  plan SubscriptionPlan? @relation(fields: [plan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user User?             @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("subscriptions")
+}
+
+model BlogPost {
+  id             Int      @id @default(autoincrement())
+  title          String
+  slug           String   @unique
+  excerpt        String
+  content        String   @db.Text
+  featured_image String?
+  category       String
+  tags           String[]
+  view_count     Int      @default(0)
+  published_at   DateTime @default(now())
+  author_id      Int
+
+  author User @relation(fields: [author_id], references: [id])
+
+  @@map("blog_posts")
+}
+
+model Testimonial {
+  id         Int      @id @default(autoincrement())
+  name       String
+  role       String
+  content    String
+  avatar_url String?
+  rating     Int      @default(5)
+  created_at DateTime @default(now())
+
+  @@map("testimonials")
+}
+
+model FAQ {
+  id       Int     @id @default(autoincrement())
+  question String
+  answer   String
+  category String?
+  active   Boolean @default(true)
+
+  @@map("faqs")
+}
+
+model PropertyPhoto {
+  id          Int     @id @default(autoincrement())
+  property_id Int
+  url         String
+  alt_text    String?
+
+  property Property @relation(fields: [property_id], references: [id])
+
+  @@map("property_photos")
+}
+
+// ─────────────────────────────────────────────────────────────
+// ECOSYSTEM MODELS — GoFlex Complete Rental Platform
+// ─────────────────────────────────────────────────────────────
+
+model Room {
+  id          Int       @id @default(autoincrement())
+  property_id Int
+  name        String    @db.VarChar(100)
+  type        String?   @default("single") @db.VarChar(50) // single, double, triple, dorm
+  floor       Int?
+  capacity    Int?      @default(1)
+  rent        Float
+  is_occupied Boolean?  @default(false)
+  amenities   Json?     @db.Json
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  property   Property         @relation(fields: [property_id], references: [id])
+  bookings   Booking[]
+  complaints Complaint[]
+  utilities  UtilityReading[]
+
+  @@map("rooms")
+}
+
+model Complaint {
+  id          Int       @id @default(autoincrement())
+  resident_id Int
+  property_id Int?
+  room_id     Int?
+  category    String    @db.VarChar(100) // maintenance, cleanliness, noise, security, other
+  priority    String?   @default("medium") @db.VarChar(20) // low, medium, high, urgent
+  title       String    @db.VarChar(255)
+  description String?
+  status      String?   @default("open") @db.VarChar(50) // open, in_progress, resolved, closed
+  resolved_at DateTime? @db.Timestamp(6)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  resident User      @relation("ResidentComplaints", fields: [resident_id], references: [id])
+  property Property? @relation(fields: [property_id], references: [id])
+  room     Room?     @relation(fields: [room_id], references: [id])
+
+  @@map("complaints")
+}
+
+model VisitorLog {
+  id            Int       @id @default(autoincrement())
+  property_id   Int
+  resident_id   Int
+  visitor_name  String    @db.VarChar(255)
+  visitor_phone String?   @db.VarChar(20)
+  purpose       String?   @db.VarChar(255)
+  check_in      DateTime  @db.Timestamp(6)
+  check_out     DateTime? @db.Timestamp(6)
+  approved      Boolean?  @default(false)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+
+  property Property @relation(fields: [property_id], references: [id])
+  resident User     @relation("ResidentVisitors", fields: [resident_id], references: [id])
+
+  @@map("visitor_logs")
+}
+
+model RentalAgreement {
+  id                 Int       @id @default(autoincrement())
+  property_id        Int
+  resident_id        Int
+  owner_id           Int
+  room_id            Int?
+  rent_amount        Float
+  security_deposit   Float?
+  start_date         DateTime  @db.Timestamp(6)
+  end_date           DateTime  @db.Timestamp(6)
+  notice_period      Int?      @default(30) // days
+  clauses            Json?     @db.Json
+  status             String?   @default("draft") @db.VarChar(50) // draft, sent, signed, expired
+  resident_signed    Boolean?  @default(false)
+  owner_signed       Boolean?  @default(false)
+  resident_signed_at DateTime? @db.Timestamp(6)
+  owner_signed_at    DateTime? @db.Timestamp(6)
+  pdf_url            String?   @db.VarChar(500)
+  digilocker_ref     String?   @db.VarChar(255)
+  renewal_reminder   DateTime? @db.Timestamp(6)
+  created_at         DateTime? @default(now()) @db.Timestamp(6)
+  updated_at         DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  property Property @relation(fields: [property_id], references: [id])
+  resident User     @relation("ResidentAgreements", fields: [resident_id], references: [id])
+  owner    User     @relation("OwnerAgreements", fields: [owner_id], references: [id])
+
+  @@map("rental_agreements")
+}
+
+model GoFlexScore {
+  id                   Int       @id @default(autoincrement())
+  user_id              Int       @unique
+  overall_score        Float?    @default(100)
+  payment_score        Float?    @default(100) // on-time payment history
+  compliance_score     Float?    @default(100) // agreement compliance
+  complaint_score      Float?    @default(100) // complaint behaviour
+  verification_score   Float?    @default(0) // KYC + documents
+  maintenance_score    Float? // for owners: maintenance responsiveness
+  responsiveness_score Float? // for owners: reply speed
+  total_reviews        Int?      @default(0)
+  avg_rating           Float?    @default(0)
+  is_verified          Boolean?  @default(false)
+  verification_badge   String?   @db.VarChar(50) // bronze, silver, gold, platinum
+  updated_at           DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("goflex_scores")
+}
+
+model CommunityPost {
+  id          Int       @id @default(autoincrement())
+  property_id Int
+  author_id   Int
+  type        String?   @default("announcement") @db.VarChar(50) // announcement, lost_found, event, marketplace, notice
+  title       String    @db.VarChar(255)
+  content     String?
+  image_url   String?   @db.VarChar(500)
+  is_pinned   Boolean?  @default(false)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  property Property @relation(fields: [property_id], references: [id])
+  author   User     @relation("AuthoredPosts", fields: [author_id], references: [id])
+
+  @@map("community_posts")
+}
+
+model ServiceRequest {
+  id            Int       @id @default(autoincrement())
+  resident_id   Int
+  property_id   Int
+  service_type  String    @db.VarChar(100) // cleaning, laundry, repairs, internet, groceries, shifting, painting
+  description   String?
+  scheduled_at  DateTime? @db.Timestamp(6)
+  status        String?   @default("pending") @db.VarChar(50) // pending, confirmed, completed, cancelled
+  cost_estimate Float?
+  final_cost    Float?
+  provider_name String?   @db.VarChar(255)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @default(now()) @updatedAt @db.Timestamp(6)
+
+  resident User     @relation("ResidentServices", fields: [resident_id], references: [id])
+  property Property @relation(fields: [property_id], references: [id])
+
+  @@map("service_requests")
+}
+
+model UtilityReading {
+  id               Int       @id @default(autoincrement())
+  property_id      Int
+  room_id          Int?
+  month            Int // 1-12
+  year             Int
+  electricity      Float? // units
+  water            Float? // units or liters
+  wifi_usage       Float? // GB
+  electricity_bill Float?
+  water_bill       Float?
+  wifi_bill        Float?
+  total_bill       Float?
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+
+  property Property @relation(fields: [property_id], references: [id])
+  room     Room?    @relation(fields: [room_id], references: [id])
+
+  @@map("utility_readings")
+}

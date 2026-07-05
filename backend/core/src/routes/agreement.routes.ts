@@ -1,9 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/db.client';
 import { authenticateJWT } from '../middleware/auth.middleware';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // GET /api/agreements — list agreements for current user
 router.get('/', authenticateJWT, async (req: Request, res: Response) => {
