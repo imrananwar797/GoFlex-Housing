@@ -17,7 +17,7 @@
     }
   ],
   "functions": {
-    "api/core": {
+    "api/core.ts": {
       "maxDuration": 15
     },
     "api/ai.py": {
