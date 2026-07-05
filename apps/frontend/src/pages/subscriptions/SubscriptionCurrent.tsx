@@ -1,292 +1,137 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { subscriptionService, Subscription } from '../../services/subscription.service';
+import PageTransition from '../../components/common/PageTransition';
+import { FileText, Landmark, Receipt, Calendar, ArrowRight } from 'lucide-react';
 import '../Dashboard.css';
 
 export default function SubscriptionCurrent() {
   const navigate = useNavigate();
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [actionInProgress, setActionInProgress] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<'pause' | 'resume' | 'cancel' | null>(null);
 
   useEffect(() => {
-    fetchSubscription();
-  }, []);
-
-  const fetchSubscription = async () => {
-    try {
-      setLoading(true);
-      const result = await subscriptionService.getCurrentSubscription();
-      if (!result.data) {
-        navigate('/subscriptions/plans');
-        return;
-      }
-      setSubscription(result.data);
-    } catch (err) {
-      setError('Failed to load subscription');
-      console.error(err);
-    } finally {
+    const timer = setTimeout(() => {
       setLoading(false);
-    }
-  };
-
-  const handleAction = async (action: 'pause' | 'resume' | 'cancel') => {
-    if (!subscription) return;
-
-    try {
-      setActionInProgress(true);
-
-      if (action === 'pause') {
-        await subscriptionService.pauseSubscription(subscription.id);
-      } else if (action === 'resume') {
-        await subscriptionService.resumeSubscription(subscription.id);
-      } else if (action === 'cancel') {
-        await subscriptionService.cancelSubscription(subscription.id);
-      }
-
-      setShowConfirmModal(false);
-      setConfirmAction(null);
-      fetchSubscription();
-    } catch (err) {
-      setError(`Failed to ${action} subscription`);
-      console.error(err);
-    } finally {
-      setActionInProgress(false);
-    }
-  };
-
-  const handleConfirm = (action: 'pause' | 'resume' | 'cancel') => {
-    setConfirmAction(action);
-    setShowConfirmModal(true);
-  };
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (loading) {
     return (
-      <section className="content-wrap">
-        <div className="loading-state">Loading your subscription...</div>
-      </section>
+      <div className="min-h-screen bg-obsidian flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-neon-blue border-t-transparent rounded-full animate-spin" />
+      </div>
     );
   }
 
-  if (!subscription) {
-    return (
-      <section className="content-wrap dashboard-page">
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">No Active Subscription</h1>
-        </div>
-        <div className="empty-state">
-          <p>You don't have an active subscription yet.</p>
-          <button
-            className="btn-cta"
-            onClick={() => navigate('/subscriptions/plans')}
-          >
-            View Plans
-          </button>
-        </div>
-      </section>
-    );
-  }
-
-  const daysUntilNextBilling = Math.ceil(
-    (new Date(subscription.nextBillingDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-  );
+  // Active lease display for premium visual design
+  const lease = {
+    propertyName: 'GoFlex Indiranagar Node',
+    city: 'Bengaluru',
+    room: 'Room 204 (Single Sharing)',
+    rent: 20000,
+    platformFee: 200, // 1%
+    totalRent: 20200,
+    securityDepositEscrowed: 40000, // 2 months
+    startDate: 'July 1, 2026',
+    endDate: 'June 30, 2027',
+    nextRentDue: 'August 1, 2026',
+    status: 'ACTIVE'
+  };
 
   return (
-    <section className="content-wrap dashboard-page">
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">Manage Your Subscription</h1>
-        <p className="dashboard-subtitle">View and manage your current plan</p>
-      </div>
-
-      {error && <div className="error-state">{error}</div>}
-
-      <div className="subscription-card main-card">
-        <div className="subscription-header">
-          <div className="subscription-info">
-            <h2>{subscription.planName}</h2>
-            <span className={`status-badge status-${subscription.status}`}>
-              {subscription.status === 'active' && '✓ Active'}
-              {subscription.status === 'paused' && '⏸ Paused'}
-              {subscription.status === 'cancelled' && '✗ Cancelled'}
-            </span>
+    <PageTransition>
+      <section className="content-wrap dashboard-page space-y-8">
+        <div className="dashboard-header flex justify-between items-center">
+          <div>
+            <h1 className="dashboard-title uppercase font-black text-white">Active Lease Ledger</h1>
+            <p className="dashboard-subtitle">Real-time payment schedules, convenience fees, and escrow holdings</p>
           </div>
-          <div className="subscription-price">
-            <span className="currency">₹</span>
-            <span className="amount">{subscription.monthlyPrice.toLocaleString()}</span>
-            <span className="period">/month</span>
-          </div>
-        </div>
-
-        <div className="subscription-details">
-          <div className="detail-row">
-            <span className="detail-label">Start Date:</span>
-            <span className="detail-value">
-              {new Date(subscription.startDate).toLocaleDateString()}
-            </span>
-          </div>
-          <div className="detail-row">
-            <span className="detail-label">Next Billing Date:</span>
-            <span className="detail-value">
-              {new Date(subscription.nextBillingDate).toLocaleDateString()}
-              <span className="days-remaining">({daysUntilNextBilling} days remaining)</span>
-            </span>
-          </div>
-          <div className="detail-row">
-            <span className="detail-label">Stripe Subscription ID:</span>
-            <span className="detail-value">
-              <code>{subscription.stripeSubscriptionId}</code>
-            </span>
-          </div>
-          {subscription.cancelledAt && (
-            <div className="detail-row">
-              <span className="detail-label">Cancelled Date:</span>
-              <span className="detail-value">
-                {new Date(subscription.cancelledAt).toLocaleDateString()}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="subscription-actions">
-          {subscription.status === 'active' && (
-            <>
-              <button
-                className="btn-ghost"
-                onClick={() => handleConfirm('pause')}
-                disabled={actionInProgress}
-              >
-                Pause Subscription
-              </button>
-              <button
-                className="btn-danger"
-                onClick={() => handleConfirm('cancel')}
-                disabled={actionInProgress}
-              >
-                Cancel Subscription
-              </button>
-            </>
-          )}
-          {subscription.status === 'paused' && (
-            <>
-              <button
-                className="btn-cta"
-                onClick={() => handleConfirm('resume')}
-                disabled={actionInProgress}
-              >
-                Resume Subscription
-              </button>
-              <button
-                className="btn-danger"
-                onClick={() => handleConfirm('cancel')}
-                disabled={actionInProgress}
-              >
-                Cancel Subscription
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-
-      <div className="billing-info">
-        <h3>Billing Information</h3>
-        <div className="billing-details">
-          <p>
-            Your subscription will automatically renew on{' '}
-            <strong>{new Date(subscription.nextBillingDate).toLocaleDateString()}</strong>.
-          </p>
-          <p>
-            {subscription.status === 'paused' &&
-              'Your subscription is currently paused. It will not renew until you resume it.'}
-            {subscription.status === 'active' &&
-              'You will be charged automatically on your next billing date.'}
-            {subscription.status === 'cancelled' &&
-              'Your subscription has been cancelled. You can resubscribe at any time.'}
-          </p>
-        </div>
-      </div>
-
-      <div className="actions-section">
-        <h3>Other Actions</h3>
-        <div className="action-links">
-          <button
-            className="action-link"
-            onClick={() => navigate('/subscriptions/history')}
-          >
-            📜 View Billing History
-          </button>
-          <button
-            className="action-link"
+          <button 
+            className="btn-cta text-xs py-2 px-4"
             onClick={() => navigate('/subscriptions/plans')}
           >
-            💳 Change Plan
-          </button>
-          <button
-            className="action-link"
-            onClick={() => navigate('/billing/invoices')}
-          >
-            📋 Download Invoices
+            Fee Structure Calculator
           </button>
         </div>
-      </div>
 
-      {showConfirmModal && confirmAction && (
-        <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Confirm Action</h2>
-              <button
-                className="modal-close"
-                onClick={() => setShowConfirmModal(false)}
-                aria-label="Close"
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              {confirmAction === 'pause' && (
-                <p>
-                  Are you sure you want to pause your subscription? You can resume it anytime.
-                  You won't be charged during the pause period.
-                </p>
-              )}
-              {confirmAction === 'resume' && (
-                <p>
-                  Are you sure you want to resume your subscription? Billing will resume
-                  on your next billing date.
-                </p>
-              )}
-              {confirmAction === 'cancel' && (
-                <div>
-                  <p className="warning-text">
-                    ⚠️ Cancelling your subscription is permanent. You'll lose access to all premium features
-                    at the end of your billing period.
-                  </p>
-                  <p>Are you sure you want to cancel?</p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Active Lease details */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-[#080A0E]/60 border border-white/10 rounded-[32px] p-8 space-y-6">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <span className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-[9px] font-black uppercase tracking-widest">
+                    {lease.status}
+                  </span>
+                  <h3 className="text-2xl font-black text-white mt-3">{lease.propertyName}</h3>
+                  <p className="text-slate-400 text-xs">{lease.room} • {lease.city}</p>
                 </div>
-              )}
+                <FileText className="text-neon-blue/40" size={32} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-6 pt-4 border-t border-white/5">
+                <div>
+                  <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Lease Term</p>
+                  <p className="text-sm font-bold text-slate-200 mt-1">{lease.startDate} - {lease.endDate}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Next Rent Due</p>
+                  <p className="text-sm font-bold text-slate-200 mt-1 flex items-center gap-1.5">
+                    <Calendar size={14} className="text-neon-blue" /> {lease.nextRentDue}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="modal-footer">
-              <button
-                className="modal-btn cancel-btn"
-                onClick={() => setShowConfirmModal(false)}
-                disabled={actionInProgress}
-              >
-                No, Keep It
-              </button>
-              <button
-                className={`modal-btn ${confirmAction === 'cancel' ? 'danger-btn' : 'primary-btn'}`}
-                onClick={() => handleAction(confirmAction)}
-                disabled={actionInProgress}
-              >
-                {actionInProgress ? 'Processing...' : `Yes, ${confirmAction}`}
-              </button>
+
+            {/* Escrow ledger card */}
+            <div className="bg-[#080A0E]/60 border border-white/10 rounded-[32px] p-8 flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Digital Escrow Holdings</p>
+                <h4 className="text-2xl font-black text-white">₹{lease.securityDepositEscrowed.toLocaleString()}</h4>
+                <p className="text-slate-500 text-[10px] uppercase font-bold">Locked in smart-contract escrow ledger</p>
+              </div>
+              <div className="p-4 bg-neon-blue/5 border border-neon-blue/15 rounded-2xl text-neon-blue">
+                <Landmark size={24} />
+              </div>
             </div>
           </div>
+
+          {/* Fee breakdown sidebar */}
+          <div className="bg-[#080A0E]/60 border border-white/10 rounded-[32px] p-8 flex flex-col justify-between bg-white/[0.01]">
+            <div className="space-y-6">
+              <div className="flex items-center gap-2">
+                <Receipt className="text-neon-blue" size={20} />
+                <h4 className="text-lg font-black text-white">Monthly Invoice Split</h4>
+              </div>
+              <p className="text-slate-400 text-xs leading-relaxed">
+                Platform transaction fee of 1% convenience charge is appended to the rent value.
+              </p>
+
+              <div className="space-y-4 pt-4 border-t border-white/5">
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>Monthly base rent:</span>
+                  <span className="font-bold text-slate-300">₹{lease.rent.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>Platform fee (1%):</span>
+                  <span className="font-bold text-neon-blue">+ ₹{lease.platformFee.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-sm font-black text-white pt-4 border-t border-white/5">
+                  <span>Total invoice:</span>
+                  <span className="text-lg text-neon-blue font-black">₹{lease.totalRent.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => navigate('/resident/payments')}
+              className="w-full mt-8 py-4 bg-neon-blue text-obsidian rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:scale-[1.02] transition-all border-none bg-transparent"
+            >
+              Pay Rent Now <ArrowRight size={14} />
+            </button>
+          </div>
         </div>
-      )}
-    </section>
+      </section>
+    </PageTransition>
   );
 }

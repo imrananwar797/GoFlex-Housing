@@ -38,14 +38,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!supabase) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        const localUser: AuthUser = {
-          id: parseInt(session.user.id.replace(/\D/g, '').slice(0, 8)) || 101,
-          username: session.user.email?.split('@')[0] || 'google_user',
-          email: session.user.email || '',
-          role: 'resident',
-          token: session.access_token
-        };
-        setUser(localUser);
+        try {
+          // Set a temporary session in localStorage so the API client's interceptor attaches the token
+          const tempUser: AuthUser = {
+            id: 0,
+            username: 'oauth_temp',
+            email: session.user.email || '',
+            role: 'resident',
+            token: session.access_token
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(tempUser));
+
+          // Fetch the synced user profile from the core backend
+          const dbUser = await authService.me();
+          
+          const localUser: AuthUser = {
+            id: dbUser.id,
+            username: dbUser.username,
+            email: dbUser.email,
+            role: dbUser.role.toLowerCase() as Role,
+            token: session.access_token
+          };
+          setUser(localUser);
+        } catch (err) {
+          console.error('Failed to sync OAuth profile with core backend:', err);
+          setUser(null);
+          localStorage.removeItem(STORAGE_KEY);
+        }
       }
     });
     return () => subscription.unsubscribe();

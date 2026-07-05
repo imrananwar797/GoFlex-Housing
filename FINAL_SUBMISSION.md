@@ -59,23 +59,22 @@ GoFlex is engineered as a scalable, distributed system managed via **Turborepo**
 - **Ethereal Landing Page**: A cinematic entry point featuring a "Sanctuary" hero section, artisan amenity showcases, and interactive location grids.
 - **Smart Booking Bar**: A centered, overlapping search module for real-time availability checks across cities.
 - **Personalized AI Picks**: Dynamic property recommendations with "Match Score" logic.
-- **Subscription Ecosystem**: Tiered membership plans (Essential, Premium, Founder) with feature comparison matrices.
+- **Double-Sided Transactional Calculator**: Live pricing transparency engine detailing our 2% commission structure (1% tenant, 1% landlord) and lease onboarding/renewal schedules.
 - **Concierge Amenities**: Detailed exploration of high-end services like Soulful Spaces, Artisan Living, and Global Pulse communities.
 
 ### 🔐 Security & Management
 - **Sentinel Authentication**: A high-security login/register flow with role-based redirection.
-- **Resident Dashboard**: Real-time occupancy tracking, booking management, and membership status.
+- **Resident Dashboard**: Real-time occupancy tracking, booking management, and rent fee breakdown.
 - **KYC Pipeline**: Secure document upload and verification system for resident onboarding.
-- **Admin/Owner Portals**: Comprehensive tools for property oversight, revenue analytics, and resident management.
+- **Admin/Owner Portals**: Comprehensive tools for property oversight, gross transaction volume analytics, and resident management.
 
 ---
 
-## 📊 Database Schema (Prisma Model)
-The system operates on a sophisticated data model designed for high-concurrency housing management:
+## 📊 Database Schema & Financial Ledgers
+The database is structured to support a dual-commission clearing model:
 - **Users**: Extended profiles with roles (Resident, Owner, Admin).
-- **Properties**: Rich metadata including amenities, capacity, and city-state mappings.
-- **Bookings**: Transactional history with status tracking (Pending, Confirmed, Cancelled).
-- **Subscriptions**: Tiered membership tracking linked to resident accounts.
+- **Properties**: Rich metadata including amenities, capacity, and location mappings.
+- **Bookings & Leases**: Leases trace `gross_rent`, `resident_convenience_fee` (1%), `owner_commission` (1%), `agreement_fee` (2.5% each), and `net_owner_payout`.
 - **KYCRecords**: Secure linkage between users and verified documentation.
 
 ---
@@ -99,6 +98,7 @@ The system operates on a sophisticated data model designed for high-concurrency 
 ## 📈 Achievement Summary
 - ✅ **UI/UX Overhaul**: Successfully transitioned from a "robotic" interface to a premium "Cyberpunk Sanctuary" aesthetic.
 - ✅ **API Connectivity**: Resolved critical backend connectivity issues and established a resilient service layer.
+- ✅ **Double-Sided Transaction Clearing**: Integrated automated 1%+1% convenience/brokerage fees and flat onboarding agreement splits.
 - ✅ **Full-Stack Integration**: Achieved seamless flow from property discovery to secure resident authentication and dashboard management.
 - ✅ **Branding Consistency**: Established a unified visual language across all platform modules.
 

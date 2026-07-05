@@ -6,9 +6,55 @@ import prisma from '../utils/db.client';
 
 export const getAllProperties = async (req: Request, res: Response) => {
   try {
-    const properties = await prisma.property.findMany();
+    const { stateIso, city, minRent, maxRent, beds, search } = req.query;
+
+    const where: any = {};
+
+    if (stateIso) {
+      where.state_iso = {
+        equals: stateIso as string,
+        mode: 'insensitive'
+      };
+    }
+
+    if (city) {
+      where.city = {
+        equals: city as string,
+        mode: 'insensitive'
+      };
+    }
+
+    if (minRent || maxRent) {
+      where.rent = {};
+      if (minRent) {
+        where.rent.gte = parseFloat(minRent as string);
+      }
+      if (maxRent) {
+        where.rent.lte = parseFloat(maxRent as string);
+      }
+    }
+
+    if (beds && beds !== 'All') {
+      let bedsCount = 1;
+      if (beds === 'Double') bedsCount = 2;
+      if (beds === 'Triple') bedsCount = 3;
+      where.beds = bedsCount;
+    }
+
+    if (search) {
+      const searchStr = search as string;
+      where.OR = [
+        { name: { contains: searchStr, mode: 'insensitive' } },
+        { description: { contains: searchStr, mode: 'insensitive' } },
+        { city: { contains: searchStr, mode: 'insensitive' } },
+        { address: { contains: searchStr, mode: 'insensitive' } }
+      ];
+    }
+
+    const properties = await prisma.property.findMany({ where });
     res.json(properties);
   } catch (error) {
+    console.error('Error fetching properties:', error);
     res.status(500).json({ detail: 'Internal server error' });
   }
 };

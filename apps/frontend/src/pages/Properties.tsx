@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { State, City } from 'country-state-city';
 import { useSearchParams } from 'react-router-dom';
 import { fetchProperties, PropertyRecord } from '../services/property.service';
 import PropertyCard from '../components/dashboard/PropertyCard';
 import PageTransition from '../components/common/PageTransition';
+import { locationService } from '../utils/locations';
 
 export default function Properties(){
   const [params] = useSearchParams();
@@ -17,8 +17,26 @@ export default function Properties(){
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const states = useMemo(()=> State.getStatesOfCountry('IN'),[]);
-  const cities = useMemo(()=> City.getCitiesOfState('IN', stateIso) || [], [stateIso]);
+  const states = useMemo(()=> locationService.getStates(), []);
+  const cities = useMemo(()=> locationService.getCitiesOfState(stateIso), [stateIso]);
+
+  // Debounced filters to prevent API request storms
+  const [debouncedQ, setDebouncedQ] = useState(q);
+  const [debouncedMin, setDebouncedMin] = useState(min);
+  const [debouncedMax, setDebouncedMax] = useState(max);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedQ(q), 350);
+    return () => clearTimeout(handler);
+  }, [q]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedMin(min);
+      setDebouncedMax(max);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [min, max]);
 
   useEffect(() => {
     let ignore = false;
@@ -30,10 +48,10 @@ export default function Properties(){
         const data = await fetchProperties({
           stateIso,
           city,
-          minRent: min,
-          maxRent: max,
+          minRent: debouncedMin,
+          maxRent: debouncedMax,
           beds,
-          search: q,
+          search: debouncedQ,
         });
         if (!ignore) {
           setProperties(data);
@@ -54,7 +72,7 @@ export default function Properties(){
     return () => {
       ignore = true;
     };
-  }, [stateIso, city, min, max, beds, q]);
+  }, [stateIso, city, debouncedMin, debouncedMax, beds, debouncedQ]);
 
   return (
     <PageTransition>

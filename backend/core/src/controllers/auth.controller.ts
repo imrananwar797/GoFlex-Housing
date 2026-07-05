@@ -136,3 +136,31 @@ export const validate2FA = async (req: Request, res: Response) => {
     res.status(401).json({ detail: 'Invalid or expired session' });
   }
 };
+
+export const getMe = async (req: Request, res: Response) => {
+  const user = (req as any).user;
+  if (!user) {
+    return res.status(401).json({ detail: 'Not authenticated' });
+  }
+
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.user_id }
+    });
+
+    if (!dbUser) {
+      return res.status(404).json({ detail: 'User not found' });
+    }
+
+    res.json({
+      id: dbUser.id,
+      username: dbUser.username,
+      email: dbUser.email,
+      role: dbUser.role
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ detail: 'Internal server error' });
+  }
+};
+

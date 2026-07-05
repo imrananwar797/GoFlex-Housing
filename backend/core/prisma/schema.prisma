@@ -28,7 +28,7 @@ model User {
   email                                          String                      @unique(map: "ix_users_email") @db.VarChar(255)
   full_name                                      String?                     @db.VarChar(255)
   phone                                          String?                     @db.VarChar(20)
-  password_hash                                  String                      @db.VarChar(255)
+  password_hash                                  String                      @map("hashed_password") @db.VarChar(255)
   role                                           userrole                    @default(RESIDENT)
   two_factor_enabled                             Boolean?                    @default(false)
   two_factor_secret                              String?                     @db.VarChar(255)

@@ -78,7 +78,7 @@ You can execute workspace-specific commands from the root directory:
 *   ✅ **AI-Powered Recommendation Engine**: Score-based property matching based on resident behavior and preferences.
 *   ✅ **User & Resident Dashboards**: Real-time occupancy status, booking histories, and profile settings.
 *   ✅ **KYC Documents Pipeline**: Secure upload and verification flow for resident identity checks.
-*   ✅ **Subscription Billing**: Stripe-integrated tiered memberships (Essential, Premium, Founder).
+*   ✅ **Double-Sided Clearing Engine**: Integrated 2% total take-rate (1% resident platform fee + 1% owner commission), digital lease agreement split (2.5% each), and dynamic fee calculator.
 *   ✅ **Admin/Owner Management Panels**: Complete user permissions editing, property verification queue, and revenue trends.
 *   ✅ **Escrow System**: Web3/blockchain-ready rent holding and conditional release contracts.
 

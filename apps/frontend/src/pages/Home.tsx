@@ -10,7 +10,7 @@ import {
 
 const ECOSYSTEM_TABS = [
   { id: 'marketplace', label: '1. Marketplace', title: 'Decision-Making Marketplace', desc: 'No more generic listings. Compare properties with verified scores, safety indices, and accurate commute times.' },
-  { id: 'saas', label: '2. Owner SaaS', title: 'Business HUD Operating System', desc: 'Manage your portfolio like a business. View vacancy heatmaps, MRR, satisfaction scores, and automated utility cost structures.' },
+  { id: 'saas', label: '2. Transaction HUD', title: 'Escrow & Payout System', desc: 'Real-time ledger tracking rent gross collections, tenant platform fees, and automated owner payouts without intermediate banks.' },
   { id: 'resident', label: '3. Resident Super App', title: 'Resident Home Companion', desc: 'A unified daily companion tracking rent payments, cafeteria meals, visitor gates, and IoT utility telemetry.' },
   { id: 'trust', label: '4. Trust & Reputation', title: 'Two-Way Reputation Protocol', desc: 'GoFlex Verified status for owners, residents, and documents. Real two-way scoring based on actual platform metrics.' },
   { id: 'services', label: '5. Service Marketplace', title: 'On-Demand Integration', desc: 'Verified partners offering cleaning, laundry, moving, and repairs directly from the resident companion app.' }
@@ -47,7 +47,7 @@ export default function Home() {
         {/* HERO SECTION */}
         <section className="relative pt-32 pb-24 flex flex-col items-center justify-center">
           <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-            <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg')] bg-cover bg-center opacity-10 grayscale mix-blend-screen" />
+            <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800')] bg-cover bg-center opacity-10 grayscale mix-blend-screen" />
             <div className="absolute inset-0 bg-gradient-to-b from-obsidian via-transparent to-obsidian" />
           </div>
 

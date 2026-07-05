@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { State, City } from 'country-state-city';
 import { Search, MapPin } from 'lucide-react';
+import { locationService } from '../../utils/locations';
 
 function withParams(src: string, w: number){
   const join = src.includes('?') ? '&' : '?';
@@ -44,13 +44,13 @@ function photoForCity(name: string){
 }
 
 export default function PopularLocations() {
-  const states = useMemo(() => State.getStatesOfCountry('IN'), []);
+  const states = useMemo(() => locationService.getStates(), []);
   const [activeIso, setActiveIso] = useState('KA');
   const [query, setQuery] = useState('');
 
   const cities = useMemo(() => {
     try {
-      const list = City.getCitiesOfState('IN', activeIso) || [];
+      const list = locationService.getCitiesOfState(activeIso) || [];
       const q = query.trim().toLowerCase();
       return q ? list.filter(c => c.name.toLowerCase().includes(q)) : list.slice(0, 8);
     } catch { return []; }

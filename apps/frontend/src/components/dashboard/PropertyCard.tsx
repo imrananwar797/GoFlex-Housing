@@ -23,7 +23,7 @@ export default function PropertyCard({ property: p }: PropertyCardProps) {
         className="property-img"
         loading="lazy"
         decoding="async"
-        src={`${p.cover_image_url}?auto=compress&cs=tinysrgb&w=1920&dpr=1`}
+        src={`${p.cover_image_url}?auto=compress&cs=tinysrgb&w=640&dpr=1`}
         alt={p.name}
       />
       <div className="property-body">

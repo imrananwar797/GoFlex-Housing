@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { City } from 'country-state-city';
+import { locationService } from '../../utils/locations';
 
 type Suggestion = { label: string; city: string; stateIso: string };
 
@@ -14,7 +14,7 @@ export default function HeaderSearch() {
   const suggestions = useMemo<Suggestion[]>(() => {
     const term = q.trim().toLowerCase();
     if (!term) return [];
-    const cities = City.getCitiesOfCountry('IN') || [];
+    const cities = locationService.getAllCities();
     return cities
       .filter(c => c.name.toLowerCase().includes(term))
       .slice(0, 8)
