@@ -46,7 +46,7 @@ const loginLimiter = rateLimit({
 
 app.use('/api', apiLimiter);
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8001;
 
 app.use(cors({
   origin: true, // Reflect request origin in production
@@ -56,17 +56,9 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Normalize Vercel/Vite rewritten URLs starting with /api/v1/core
-app.use((req, res, next) => {
-  if (req.url.startsWith('/api/v1/core')) {
-    const subPath = req.url.substring('/api/v1/core'.length);
-    if (subPath === '/health' || subPath.startsWith('/health?')) {
-      req.url = subPath;
-    } else {
-      req.url = '/api' + subPath;
-    }
-  }
-  next();
-});
+// Removed URL rewriting middleware – Vercel now forwards paths directly.
+// If needed, additional middleware can be added here.
+
 
 import analyticsRoutes from './routes/analytics.routes';
 
@@ -142,6 +134,7 @@ app.get('/api/v1/network/stats', async (req, res) => {
   res.json(cachedStats || { detail: 'Service warming up' });
 });
 
+// Primary health endpoint used by Vercel rewrites
 app.get('/health', async (req, res) => {
   let dbStatus = 'disconnected';
   try {
@@ -160,12 +153,24 @@ app.get('/health', async (req, res) => {
   });
 });
 
+// Expose the same health check under the Vercel‑rewritten path for convenience
+app.get('/api/v1/core/health', async (req, res, next) => {
+  // Reuse the health logic above
+  req.url = '/health';
+  next();
+});
+
 // For local Docker/development / production deployments (excluding serverless like Vercel)
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`Node.js Core Backend running on port ${PORT}`);
   });
 }
+
+// Catch‑all route for unknown API paths – returns JSON 404
+app.use((req, res) => {
+  res.status(404).json({ detail: 'Not Found', path: req.originalUrl });
+});
 
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

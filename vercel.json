@@ -9,7 +9,7 @@
     },
     {
       "source": "/api/v1/ai/:path*",
-      "destination": "/api/ai.py"
+      "destination": "/api/ai/:path*"
     },
     {
       "source": "/((?!api/).*)",
