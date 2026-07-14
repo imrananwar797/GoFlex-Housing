@@ -27,3 +27,8 @@ implementation_plan.md
 task.md
 walkthrough.md
 scratch
+
+# Large developer tools and environments
+.venv
+supabase.exe
+supabase_cli.tar.gz

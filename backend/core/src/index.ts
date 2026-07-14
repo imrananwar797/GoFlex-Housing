@@ -56,8 +56,17 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Normalize Vercel/Vite rewritten URLs starting with /api/v1/core
-// Removed URL rewriting middleware – Vercel now forwards paths directly.
-// If needed, additional middleware can be added here.
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api/v1/core')) {
+    const subPath = req.url.substring('/api/v1/core'.length);
+    if (subPath === '/health' || subPath.startsWith('/health?')) {
+      req.url = subPath;
+    } else {
+      req.url = '/api' + subPath;
+    }
+  }
+  next();
+});
 
 
 import analyticsRoutes from './routes/analytics.routes';
