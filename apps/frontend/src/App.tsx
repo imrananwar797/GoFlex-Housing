@@ -353,16 +353,6 @@ export default function App() {
                     <NavAuthActions />
                   </div>
 
-                  {/* Install App (PWA — only shows when available) */}
-                  {showInstallBtn && (
-                    <button
-                      onClick={triggerInstall}
-                      className="hidden lg:flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-2 bg-white/5 border border-white/10 hover:border-neon-blue/40 hover:bg-neon-blue/5 text-slate-300 hover:text-neon-blue rounded-lg transition-all duration-200"
-                    >
-                      ↓ Install
-                    </button>
-                  )}
-
                   {/* Mobile hamburger */}
                   <button
                     className="xl:hidden p-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/10 transition-all"
@@ -533,6 +523,18 @@ export default function App() {
                   <p className="text-slate-500 leading-relaxed max-w-sm text-xs font-medium">
                     Flexible co-living spaces curated for modern professionals across thriving cities.
                   </p>
+
+                  {/* PWA Install Button */}
+                  {showInstallBtn && (
+                    <div className="pt-1">
+                      <button
+                        onClick={triggerInstall}
+                        className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-4 py-2 bg-white/5 border border-white/10 hover:border-neon-blue/40 hover:bg-neon-blue/5 text-slate-300 hover:text-neon-blue rounded-lg transition-all duration-200"
+                      >
+                        ↓ Install Web App
+                      </button>
+                    </div>
+                  )}
                   
                   {/* Social Icons */}
                   <div className="flex gap-3">
