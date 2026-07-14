@@ -248,22 +248,74 @@ export default function App() {
                 </NavLink>
 
                 {/* ── CENTER: Desktop Mega Nav ── */}
-                <div className="hidden xl:flex items-center gap-1 bg-white/[0.04] px-2 py-1.5 rounded-2xl border border-white/[0.07] relative group/mega">
+                <div className="hidden xl:flex items-center gap-1 bg-white/[0.04] px-2 py-1.5 rounded-2xl border border-white/[0.07] relative">
 
-                  {/* Nav Buttons */}
-                  {[
-                    { label: 'Marketplace' },
-                    { label: 'Services' },
-                    { label: 'Cities' },
-                    { label: 'Enterprise' },
-                  ].map((item) => (
-                    <button
-                      key={item.label}
-                      className="nav-pill"
-                    >
-                      {item.label} <ChevronDown size={9} className="opacity-60" />
-                    </button>
-                  ))}
+                  {/* Mega Menu Group (triggers only on Marketplace, Services, Cities, Enterprise) */}
+                  <div className="flex items-center gap-1 group/mega">
+                    {/* Nav Buttons */}
+                    {[
+                      { label: 'Marketplace' },
+                      { label: 'Services' },
+                      { label: 'Cities' },
+                      { label: 'Enterprise' },
+                    ].map((item) => (
+                      <button
+                        key={item.label}
+                        className="nav-pill"
+                      >
+                        {item.label} <ChevronDown size={9} className="opacity-60" />
+                      </button>
+                    ))}
+
+                    {/* ── Unified Mega-Menu Panel ── */}
+                    <div className="mega-menu-panel">
+                      <div className="mega-menu-inner">
+                        {/* Marketplace */}
+                        <div className="mega-col">
+                          <h5 className="mega-col-title"><span className="mega-dot" /> Marketplace</h5>
+                          <NavLink to="/properties?type=buy" className="mega-link">Buy Property</NavLink>
+                          <NavLink to="/properties?type=rent" className="mega-link">Rent Property</NavLink>
+                          <NavLink to="/properties?category=coliving" className="mega-link">PG &amp; Co-Living</NavLink>
+                          <NavLink to="/properties?category=commercial" className="mega-link">Commercial</NavLink>
+                          <NavLink to="/properties?category=student" className="mega-link">Student Housing</NavLink>
+                          <NavLink to="/properties?category=luxury" className="mega-link">Luxury Homes</NavLink>
+                          <NavLink to="/properties" className="mega-link-cta">View all →</NavLink>
+                        </div>
+                        {/* Services */}
+                        <div className="mega-col">
+                          <h5 className="mega-col-title"><span className="mega-dot" /> Services</h5>
+                          <NavLink to="/properties" className="mega-link flex items-center gap-1.5">
+                            AI Property Match <span className="badge-ai">AI</span>
+                          </NavLink>
+                          <NavLink to="/how-it-works" className="mega-link">Housing Management</NavLink>
+                          <NavLink to="/resident/agreement" className="mega-link">Rent Agreement</NavLink>
+                          <NavLink to="/kyc/status" className="mega-link">Digital KYC</NavLink>
+                          <NavLink to="/resident/payments" className="mega-link">Online Payments</NavLink>
+                          <NavLink to="/resident/services" className="mega-link">Maintenance</NavLink>
+                          <NavLink to="/properties" className="mega-link-cta">View all →</NavLink>
+                        </div>
+                        {/* Cities */}
+                        <div className="mega-col">
+                          <h5 className="mega-col-title"><span className="mega-dot" /> Top Cities</h5>
+                          {['Kolkata','Bangalore','Hyderabad','Mumbai','Delhi','Pune','Chennai'].map((city) => (
+                            <NavLink key={city} to={`/locations?city=${city.toLowerCase()}`} className="mega-link">{city}</NavLink>
+                          ))}
+                          <NavLink to="/locations" className="mega-link-cta">View all →</NavLink>
+                        </div>
+                        {/* Enterprise */}
+                        <div className="mega-col">
+                          <h5 className="mega-col-title"><span className="mega-dot" /> Enterprise</h5>
+                          <NavLink to="/owner/properties" className="mega-link">For Owners</NavLink>
+                          <NavLink to="/about" className="mega-link">For Builders</NavLink>
+                          <NavLink to="/about" className="mega-link">For Property Managers</NavLink>
+                          <NavLink to="/about" className="mega-link">For PG Operators</NavLink>
+                          <NavLink to="/about" className="mega-link">Corporate Housing</NavLink>
+                          <NavLink to="/about" className="mega-link">Universities</NavLink>
+                          <NavLink to="/about" className="mega-link-cta">Explore →</NavLink>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   <NavLink to="/subscriptions/plans" className="nav-pill">Pricing</NavLink>
 
@@ -283,55 +335,6 @@ export default function App() {
                         ].map((n) => (
                           <NavLink key={n.label} to={n.to} className="dropdown-link">{n.label}</NavLink>
                         ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ── Unified Mega-Menu Panel ── */}
-                  <div className="mega-menu-panel">
-                    <div className="mega-menu-inner">
-                      {/* Marketplace */}
-                      <div className="mega-col">
-                        <h5 className="mega-col-title"><span className="mega-dot" /> Marketplace</h5>
-                        <NavLink to="/properties?type=buy" className="mega-link">Buy Property</NavLink>
-                        <NavLink to="/properties?type=rent" className="mega-link">Rent Property</NavLink>
-                        <NavLink to="/properties?category=coliving" className="mega-link">PG &amp; Co-Living</NavLink>
-                        <NavLink to="/properties?category=commercial" className="mega-link">Commercial</NavLink>
-                        <NavLink to="/properties?category=student" className="mega-link">Student Housing</NavLink>
-                        <NavLink to="/properties?category=luxury" className="mega-link">Luxury Homes</NavLink>
-                        <NavLink to="/properties" className="mega-link-cta">View all →</NavLink>
-                      </div>
-                      {/* Services */}
-                      <div className="mega-col">
-                        <h5 className="mega-col-title"><span className="mega-dot" /> Services</h5>
-                        <NavLink to="/properties" className="mega-link flex items-center gap-1.5">
-                          AI Property Match <span className="badge-ai">AI</span>
-                        </NavLink>
-                        <NavLink to="/how-it-works" className="mega-link">Housing Management</NavLink>
-                        <NavLink to="/resident/agreement" className="mega-link">Rent Agreement</NavLink>
-                        <NavLink to="/kyc/status" className="mega-link">Digital KYC</NavLink>
-                        <NavLink to="/resident/payments" className="mega-link">Online Payments</NavLink>
-                        <NavLink to="/resident/services" className="mega-link">Maintenance</NavLink>
-                        <NavLink to="/properties" className="mega-link-cta">View all →</NavLink>
-                      </div>
-                      {/* Cities */}
-                      <div className="mega-col">
-                        <h5 className="mega-col-title"><span className="mega-dot" /> Top Cities</h5>
-                        {['Kolkata','Bangalore','Hyderabad','Mumbai','Delhi','Pune','Chennai'].map((city) => (
-                          <NavLink key={city} to={`/locations?city=${city.toLowerCase()}`} className="mega-link">{city}</NavLink>
-                        ))}
-                        <NavLink to="/locations" className="mega-link-cta">View all →</NavLink>
-                      </div>
-                      {/* Enterprise */}
-                      <div className="mega-col">
-                        <h5 className="mega-col-title"><span className="mega-dot" /> Enterprise</h5>
-                        <NavLink to="/owner/properties" className="mega-link">For Owners</NavLink>
-                        <NavLink to="/about" className="mega-link">For Builders</NavLink>
-                        <NavLink to="/about" className="mega-link">For Property Managers</NavLink>
-                        <NavLink to="/about" className="mega-link">For PG Operators</NavLink>
-                        <NavLink to="/about" className="mega-link">Corporate Housing</NavLink>
-                        <NavLink to="/about" className="mega-link">Universities</NavLink>
-                        <NavLink to="/about" className="mega-link-cta">Explore →</NavLink>
                       </div>
                     </div>
                   </div>

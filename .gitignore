@@ -47,6 +47,12 @@ uploads/
 *.jpg
 *.png
 *.pdf
+!**/public/**/*.png
+!**/public/**/*.jpg
+!**/public/**/*.pdf
+!**/src/assets/**/*.png
+!**/src/assets/**/*.jpg
+!**/src/assets/**/*.pdf
 
 # Coverage reports
 .coverage
