@@ -1,6 +1,6 @@
-# GoFlex Housing - SmartPG Management System (Cyberpunk Sanctuary)
+# GoFlex Housing - Next-Generation Housing Management System (Cyberpunk Sanctuary)
 
-GoFlex Housing is a next-generation co-living ecosystem designed for modern tech professionals and residents. Blending a sleek **"Cyberpunk Sanctuary"** aesthetic with state-of-the-art PropTech, GoFlex integrates AI-driven recommendations, blockchain-ready escrow security, and a premium dashboard system.
+GoFlex Housing is a Next-Generation Housing Management System designed for modern tech professionals and residents. Blending a sleek **"Cyberpunk Sanctuary"** aesthetic with state-of-the-art PropTech, GoFlex integrates AI-driven recommendations, blockchain-ready escrow security, and a premium dashboard system.
 
 Built on a robust monorepo architecture managed via **Turborepo**, the project combines a React + Vite frontend, a Node.js Express core backend, and a Python FastAPI AI microservice.
 

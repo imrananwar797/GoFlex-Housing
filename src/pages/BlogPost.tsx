@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, NavLink } from 'react-router-dom';
 import { api } from '../services/api';
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 interface BlogPostData {
   id: string;
   title: string;

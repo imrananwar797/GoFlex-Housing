@@ -47,3 +47,6 @@ export { default as OwnerPropertyRevenue } from './owner/OwnerPropertyRevenue';
 export { default as OwnerPropertyReviews } from './owner/OwnerPropertyReviews';
 
 export { default as Referrals } from './Referrals';
+export { default as Privacy } from './Privacy';
+export { default as Careers } from './Careers';
+export { default as HowItWorks } from './HowItWorks';

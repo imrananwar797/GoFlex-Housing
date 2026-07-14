@@ -104,8 +104,8 @@ export default function Login() {
           <div className="glass-morphism rounded-[32px] p-10 border-white/10 shadow-2xl relative overflow-hidden">
             {/* Header */}
             <div className="text-center mb-10">
-              <div className="w-16 h-16 bg-neon-blue/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-neon-blue/20">
-                {show2FA ? <ShieldCheck className="text-neon-blue" size={32} /> : <LogIn className="text-neon-blue" size={32} />}
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <img src="/logo.png" alt="GoFlex Logo" className="h-14 w-auto object-contain" />
               </div>
               <h1 className="text-3xl font-black text-white tracking-tight mb-2">
                 {show2FA ? 'Identity Verification' : 'Welcome Back'}

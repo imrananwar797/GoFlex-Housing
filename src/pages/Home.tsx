@@ -107,8 +107,8 @@ export default function Home() {
         <div className="hero-overlay">
           <div className="hero-layout">
             <article className="hero-intro">
-              <span className="section-eyebrow">Next-gen co-living</span>
-              <h1 className="hero-title">Premium Co-Living Suites for High-Performance Residents</h1>
+              <span className="section-eyebrow">Next-Generation Housing Management System</span>
+              <h1 className="hero-title">Premium Co-Living Spaces & Next-Generation Housing Management System</h1>
               <p className="hero-lede">Purpose-built residences that blend elevated interiors, tech-enabled amenities, and a concierge-grade community experience.</p>
               <div className="hero-actions">
                 <a className="btn-cta" href="#contact">Book a discovery call</a>

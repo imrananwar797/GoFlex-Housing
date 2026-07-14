@@ -146,7 +146,7 @@ app.get('/health', async (req, res) => {
 
   res.json({ 
     status: dbStatus === 'connected' ? 'ok' : 'degraded', 
-    service: 'GoFlex Core',
+    service: 'GoFlex Core - Next-Generation Housing Management System',
     database: dbStatus,
     uptime: process.uptime(),
     timestamp: new Date().toISOString()

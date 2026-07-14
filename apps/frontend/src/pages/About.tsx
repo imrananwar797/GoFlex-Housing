@@ -58,7 +58,7 @@ export default function About() {
               transition={{ delay: 0.2 }}
               className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed"
             >
-              GoFlex Housing brings together premium spaces, cutting-edge technology, and vibrant communities to create the perfect living experience for high-performance residents.
+              GoFlex Housing is a Next-Generation Housing Management System that brings together premium spaces, cutting-edge technology, and vibrant communities to create the perfect living experience for high-performance residents.
             </motion.p>
           </div>
         </section>

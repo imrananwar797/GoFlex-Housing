@@ -50,8 +50,8 @@ export default function Register() {
           <div className="glass-morphism rounded-[32px] p-10 border-white/10 shadow-2xl relative overflow-hidden">
             {/* Header */}
             <div className="text-center mb-10">
-              <div className="w-16 h-16 bg-purple-600/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-purple-600/20">
-                <UserPlus className="text-purple-500" size={32} />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <img src="/logo.png" alt="GoFlex Logo" className="h-14 w-auto object-contain" />
               </div>
               <h1 className="text-3xl font-black text-white tracking-tight mb-2">Create Account</h1>
               <p className="text-slate-400 text-sm">Join the future of high-performance urban living</p>

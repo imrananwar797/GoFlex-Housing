@@ -102,10 +102,11 @@ export default function DashboardLayout({
         <div className="flex flex-col h-full p-4">
           <div className="flex items-center justify-between mb-10 px-2 mt-4">
             <div className="flex items-center gap-2">
-               <span className="text-xl font-black text-neon-blue lg:hidden">G</span>
+               <img src="/logo.png" alt="GoFlex Logo" className="h-6 w-auto object-contain lg:hidden" />
                {(isSidebarOpen || isMobileMenuOpen) && (
-                 <span className="text-xl font-black tracking-tighter text-white">
-                   GoFlex <span className="text-neon-blue">Housing</span>
+                 <span className="flex items-center gap-2 text-xl font-black tracking-tighter text-white">
+                   <img src="/logo.png" alt="GoFlex Logo" className="h-6 w-auto object-contain" />
+                   <span>GoFlex <span className="text-neon-blue">Housing</span></span>
                  </span>
                )}
             </div>

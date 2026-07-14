@@ -5,7 +5,7 @@ from enum import Enum as PyEnum
 from app.core.database import Base
 from sqlalchemy import (JSON, Boolean, Column, Date, DateTime, Enum, Float,
                         ForeignKey, Integer, LargeBinary, String, Text)
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, synonym
 from sqlalchemy.sql import func
 
 
@@ -26,7 +26,7 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     full_name = Column(String(255), nullable=True)
     phone = Column(String(20), nullable=True)
-    password_hash = Column(String(255), nullable=False)
+    password_hash = Column("hashed_password", String(255), nullable=False)
     role = Column(Enum(UserRole), default=UserRole.RESIDENT, nullable=False)
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
@@ -96,7 +96,7 @@ class Property(Base):
     amenities = Column(JSON, nullable=True)
     featured_image = Column(String(500), nullable=True)
     cover_image_url = Column(String(500), nullable=True)
-    rent = Column(Float, nullable=True)
+    rent = synonym("monthly_price")
     verified = Column(Boolean, default=False)
     active = Column(Boolean, default=True)
     created_at = Column(DateTime, server_default=func.now())

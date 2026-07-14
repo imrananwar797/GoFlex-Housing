@@ -44,7 +44,6 @@ export default function Blog() {
 
   useEffect(() => {
     fetchBlogPosts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory, searchTerm]);
 
   return (

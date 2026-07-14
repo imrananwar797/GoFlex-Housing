@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="GoFlex Housing Backend API",
+    description="GoFlex Housing - Next-Generation Housing Management System Backend API",
     debug=settings.DEBUG
 )
 
@@ -101,7 +101,7 @@ app.include_router(kyc.router, prefix="/api/kyc", tags=["kyc"])
 @app.get("/", tags=["root"])
 async def root():
     return {
-        "message": "Welcome to GoFlex Housing Backend API",
+        "message": "Welcome to GoFlex Housing - Next-Generation Housing Management System Backend API",
         "docs": "/docs",
         "version": settings.APP_VERSION
     }

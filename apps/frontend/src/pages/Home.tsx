@@ -54,7 +54,7 @@ export default function Home() {
           <div className="relative z-10 max-w-7xl mx-auto px-8 w-full text-center space-y-8">
             <div className="flex items-center justify-center gap-2">
               <span className="flex items-center gap-1.5 px-3.5 py-1 bg-neon-blue/10 border border-neon-blue/30 text-neon-blue rounded-full text-[10px] font-black uppercase tracking-widest animate-pulse">
-                <Globe size={12} /> GoFlex Operating System Online
+                <Globe size={12} /> GoFlex Housing Management System Online
               </span>
             </div>
 
@@ -65,7 +65,7 @@ export default function Home() {
             </h1>
 
             <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
-              Ditch generic listing sites. GoFlex is the complete operating system for the rental ecosystem. We power findings, rentings, livings, payings, and operations.
+              Ditch generic listing sites. GoFlex is a Next-Generation Housing Management System. We power findings, rentings, livings, payings, and operations.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4 pt-6">
@@ -335,7 +335,7 @@ export default function Home() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
-                { title: 'Multi-Property OS', desc: 'Central pricing, regional manager logins, and unified B2B analytics.' },
+                { title: 'Multi-Property Management', desc: 'Central pricing, regional manager logins, and unified B2B analytics.' },
                 { title: 'API Integration', desc: 'Secure endpoints for college housing portals and smart lock systems.' },
                 { title: 'Bulk eSignatures', desc: 'Generate and send thousands of rental agreements via automated flows.' },
                 { title: 'Enterprise Audit logs', desc: 'Secure, trackable audit ledger for operations and compliance logs.' }

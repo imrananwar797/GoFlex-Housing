@@ -39,7 +39,7 @@ export default function About() {
               <span className="section-eyebrow">About GoFlex Housing</span>
               <h1 className="hero-title">Redefining Co-Living for Modern India</h1>
               <p className="hero-lede">
-                GoFlex Housing brings together premium spaces, cutting-edge technology, and vibrant communities to create the perfect living experience for high-performance residents.
+                GoFlex Housing is a Next-Generation Housing Management System that brings together premium spaces, cutting-edge technology, and vibrant communities to create the perfect living experience for high-performance residents.
               </p>
             </article>
           </div>

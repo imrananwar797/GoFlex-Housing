@@ -113,7 +113,7 @@ docker-compose -f docker-compose.prod.yml up -d --build
 - Verify that both `DATABASE_URL` (pooler) and `DIRECT_URL` (direct connection string for schema changes) are configured.
 
 **2. FastAPI AI Service Host Translation Errors**
-- If the AI microservice fails to resolve the database host name (e.g. `db.wzrphhppwzfczkxyhiyy.supabase.co`), verify network connectivity to the database or DNS settings on the hosting platform.
+- If the AI microservice fails to resolve the database host name (e.g. `db.wzrphhppzfczkxxihyiy.supabase.co`), verify network connectivity to the database or DNS settings on the hosting platform.
 
 **3. CORS Blocking Errors**
 - Verify that `CORS_ORIGIN` in `backend/core` exactly matches the URL of your deployed frontend app (e.g. `https://goflex-housing.vercel.app`) without trailing slashes.

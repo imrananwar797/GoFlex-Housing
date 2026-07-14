@@ -26,7 +26,11 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
 
     const isSupabaseToken = decoded && (
       decoded.iss === 'supabase' ||
-      (decoded.iss && decoded.iss.includes('.supabase.co/auth/v1'))
+      (decoded.iss && (
+        decoded.iss.includes('.supabase.co/auth/v1') ||
+        decoded.iss.includes('/auth/v1') ||
+        decoded.iss.includes('supabase')
+      ))
     );
 
     if (isSupabaseToken) {
@@ -38,8 +42,10 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
         return res.sendStatus(403);
       }
 
+      const normalizedSupabaseUrl = supabaseUrl.endsWith('/') ? supabaseUrl.slice(0, -1) : supabaseUrl;
+
       // Delegate verification of token to Supabase Auth API
-      axios.get(`${supabaseUrl}/auth/v1/user`, {
+      axios.get(`${normalizedSupabaseUrl}/auth/v1/user`, {
         headers: {
           Authorization: `Bearer ${token}`,
           apikey: supabaseAnonKey,
