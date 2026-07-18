@@ -1,13 +1,12 @@
-import { Router } from 'express';
-import { getAllProperties, getPropertyById, createProperty, updateProperty, deleteProperty } from '../controllers/property.controller';
-import { authenticateJWT as authenticate } from '../middleware/auth.middleware';
+import express from 'express';
+import { getProperties, getFeaturedProperties, getPropertyById, searchProperties, getCities } from '../controllers/property.controller';
 
-const router = Router();
+const router = express.Router();
 
-router.get('/', getAllProperties);
+router.get('/', getProperties);
+router.get('/featured', getFeaturedProperties);
+router.get('/search', searchProperties);
+router.get('/cities', getCities);
 router.get('/:id', getPropertyById);
-router.post('/', authenticate, createProperty);
-router.put('/:id', authenticate, updateProperty);
-router.delete('/:id', authenticate, deleteProperty);
 
 export default router;

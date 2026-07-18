@@ -1,11 +1,13 @@
-import { Router } from 'express';
-import { getPaymentMethods, initiatePayment, handleWebhook } from '../controllers/payment.controller';
-import { authenticateJWT } from '../middleware/auth.middleware';
+import express from 'express';
+import { authenticate } from '../middleware/auth.middleware';
+import { getMyPayments, getPaymentReceipt, initializePayment, getOwnerPaymentsSummary } from '../controllers/payment.controller';
 
-const router = Router();
+const router = express.Router();
 
-router.get('/methods', authenticateJWT, getPaymentMethods);
-router.post('/initiate', authenticateJWT, initiatePayment);
-router.post('/webhook', handleWebhook); // Public webhook endpoint
+router.use(authenticate);
+router.get('/', getMyPayments);
+router.get('/receipt/:id', getPaymentReceipt);
+router.post('/initialize', initializePayment);
+router.get('/owner/summary', getOwnerPaymentsSummary);
 
 export default router;

@@ -1,5 +1,5 @@
 import { PrismaClient } from '../generated/client';
-import { aiService } from '../services/ai.service';
+import { getRecommendations } from '../services/ai.service';
 
 const prisma = new PrismaClient();
 
@@ -12,7 +12,7 @@ export const extendedPrisma = prisma.$extends({
         // After updating a user, trigger a background refresh of their AI recommendations
         // We don't 'await' it to keep the main request fast (Event Loop optimization)
         if (result && result.id) {
-          aiService.getRecommendations(result.id)
+          getRecommendations({ budget: 10000, user_id: result.id })
             .then(() => console.log(`✅ AI Recommendations refreshed for User #${result.id}`))
             .catch(err => console.warn(`⚠️ Failed to trigger AI refresh: ${err.message}`));
         }

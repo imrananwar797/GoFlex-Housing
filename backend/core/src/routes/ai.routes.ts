@@ -1,14 +1,31 @@
 import { Router } from 'express';
-import { aiService } from '../services/ai.service';
+import { authenticate } from '../middleware/auth.middleware';
+import { getRecommendations } from '../services/ai.service';
+
 const router = Router();
 
-router.get('/recommendations', async (req, res) => {
-  const { user_id } = req.query;
+router.post('/recommendations', authenticate, async (req, res) => {
   try {
-    const data = await aiService.getRecommendations(Number(user_id));
-    res.json(data);
+    const { budget, city, amenities } = req.body;
+    const user_id = (req as any).user?.user_id;
+    const recommendations = await getRecommendations({ budget: Number(budget) || 10000, city, amenities, user_id });
+    res.json(recommendations);
   } catch (error) {
-    res.status(500).json({ detail: 'AI Service error' });
+    console.error('[AI Route]', error);
+    res.status(500).json({ detail: 'Recommendation service error' });
+  }
+});
+
+router.get('/recommendations', async (req, res) => {
+  try {
+    const { budget, city } = req.query;
+    const recommendations = await getRecommendations({
+      budget: Number(budget) || 10000,
+      city: city ? String(city) : undefined,
+    });
+    res.json(recommendations);
+  } catch (error) {
+    res.status(500).json({ detail: 'Recommendation service error' });
   }
 });
 

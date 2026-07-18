@@ -1,11 +1,14 @@
-import { Router } from 'express';
-import { createBooking, getMyBookings } from '../controllers/booking.controller';
-import { authenticateJWT } from '../middleware/auth.middleware';
+import express from 'express';
+import { authenticate } from '../middleware/auth.middleware';
+import { createBooking, getMyBookings, getBookingById, cancelBooking, confirmBooking } from '../controllers/booking.controller';
 
-const router = Router();
+const router = express.Router();
 
-router.use(authenticateJWT);
+router.use(authenticate);
 router.post('/', createBooking);
-router.get('/my', getMyBookings);
+router.get('/', getMyBookings);
+router.get('/:id', getBookingById);
+router.patch('/:id/cancel', cancelBooking);
+router.patch('/:id/confirm', confirmBooking);
 
 export default router;

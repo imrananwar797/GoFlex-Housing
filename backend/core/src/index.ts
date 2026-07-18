@@ -18,6 +18,8 @@ import complaintRoutes from './routes/complaint.routes';
 import agreementRoutes from './routes/agreement.routes';
 import communityRoutes from './routes/community.routes';
 import servicesRoutes from './routes/services.routes';
+import adminRoutes from './routes/admin.routes';
+import roomRoutes from './routes/room.routes';
 import rateLimit from 'express-rate-limit';
 import prisma from './utils/db.client';
 
@@ -89,6 +91,8 @@ app.use('/api/complaints', complaintRoutes);
 app.use('/api/agreements', agreementRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/services', servicesRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/rooms', roomRoutes);
 
 let cachedStats: any = {
   active_nodes: 3,

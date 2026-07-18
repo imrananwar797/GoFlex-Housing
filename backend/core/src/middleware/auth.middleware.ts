@@ -122,3 +122,18 @@ export const authorizeRole = (role: string) => {
     }
   };
 };
+
+// Alias for cleaner imports
+export const authenticate = authenticateJWT;
+
+// Multi-role authorization factory: requireRole('ADMIN', 'OWNER')
+export const requireRole = (...roles: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user;
+    if (user && roles.map(r => r.toUpperCase()).includes(user.role?.toUpperCase())) {
+      next();
+    } else {
+      res.status(403).json({ detail: 'Insufficient permissions. Required role: ' + roles.join(' or ') });
+    }
+  };
+};

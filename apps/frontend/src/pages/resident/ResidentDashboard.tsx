@@ -7,7 +7,7 @@ import {
   Users, Zap, Bell, ChevronRight, CheckCircle2, Clock, ShieldCheck, LogIn, Utensils
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
-import { apiClient } from '../../services/api.client';
+import { api } from '../../services/api';
 
 const QUICK_ACTIONS = [
   { to: '/resident/payments', icon: CreditCard, label: 'Pay Rent', color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
@@ -20,6 +20,8 @@ const QUICK_ACTIONS = [
 export default function ResidentDashboard() {
   const { user } = useAuth();
   const [complaints, setComplaints] = useState<any[]>([]);
+  const [activeBooking, setActiveBooking] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   // Daily food menu mock
@@ -46,12 +48,34 @@ export default function ResidentDashboard() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiClient.get('/complaints');
-        setComplaints(res.data.data?.slice(0, 2) || []);
+        const [meRes, complaintsRes, bookingsRes] = await Promise.allSettled([
+          api.get('/api/auth/me'),
+          api.get('/api/complaints/mine'),
+          api.get('/api/bookings'),
+        ]);
+
+        if (meRes.status === 'fulfilled') setProfile(meRes.value.data);
+        if (complaintsRes.status === 'fulfilled') {
+          const data = complaintsRes.value.data;
+          const list = Array.isArray(data) ? data : (data.complaints || []);
+          setComplaints(list.filter((c: any) => c.status !== 'resolved').slice(0, 2));
+        }
+        if (bookingsRes.status === 'fulfilled') {
+          const data = bookingsRes.value.data;
+          const list = Array.isArray(data) ? data : (data.bookings || []);
+          const confirmed = list.find((b: any) => b.status === 'confirmed');
+          if (confirmed) setActiveBooking(confirmed);
+        }
       } catch { /* offline gracefully */ }
       finally { setLoading(false); }
     })();
   }, []);
+
+  const goFlexScore = profile?.goflex_score?.overall_score ?? user?.goflex_score?.overall_score ?? '--';
+  const badge = profile?.goflex_score?.verification_badge ?? 'bronze';
+  const rentAmount = activeBooking?.total_amount ? `₹${activeBooking.total_amount.toLocaleString('en-IN')}` : '₹8,500';
+  const propertyName = activeBooking?.property?.name ?? 'Your Property';
+
 
   return (
     <DashboardLayout title="Home Companion">
@@ -63,14 +87,14 @@ export default function ResidentDashboard() {
             <h2 className="text-3xl font-black text-white">
               Welcome home, <span className="text-neon-blue">{user?.full_name?.split(' ')[0] || user?.username}</span>
             </h2>
-            <p className="text-slate-500 text-sm mt-1 font-semibold uppercase tracking-wider">Suite 204 · GoFlex Indiranagar Node</p>
+            <p className="text-slate-500 text-sm mt-1 font-semibold uppercase tracking-wider">{propertyName}</p>
           </div>
           
           <div className="flex items-center gap-4 bg-white/5 border border-white/5 px-6 py-3 rounded-2xl">
             <ShieldCheck className="text-emerald-400" size={24} />
             <div>
               <p className="text-white font-black text-sm">Two-Way Verified Resident</p>
-              <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mt-0.5">GoFlex Score: 94/100</p>
+              <p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mt-0.5">GoFlex Score: {goFlexScore}/100 · {badge.toUpperCase()}</p>
             </div>
           </div>
         </div>
@@ -87,7 +111,7 @@ export default function ResidentDashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-rose-400 mb-2">Rent Due</p>
-                  <p className="text-4xl font-black text-white">₹8,500 <span className="text-xs text-slate-500 font-semibold">/ month</span></p>
+                  <p className="text-4xl font-black text-white">{rentAmount} <span className="text-xs text-slate-500 font-semibold">/ month</span></p>
                   <p className="text-sm font-bold text-slate-400 mt-2">Next payment cycle due in 5 days</p>
                 </div>
                 <NavLink to="/resident/payments"

@@ -1,61 +1,30 @@
-import { Router } from 'express';
-import axios from 'axios';
+import express from 'express';
+import { authenticate, requireRole } from '../middleware/auth.middleware';
+import {
+  getOwnerDashboard,
+  getOwnerProperties,
+  createProperty,
+  updateProperty,
+  getOwnerResidents,
+  getOwnerRevenue,
+  getOwnerBookings,
+  getOwnerAgreements,
+  ownerSignAgreement,
+} from '../controllers/owner.controller';
 
-const router = Router();
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8001';
-const INTERNAL_SECRET = process.env.INTERNAL_SECRET || 'goflex-internal-m2m-secret';
+const router = express.Router();
 
-const aiHeaders = (req: any) => ({
-  'X-Internal-Secret': INTERNAL_SECRET,
-  Authorization: req.headers.authorization
-});
+router.use(authenticate);
+router.use(requireRole('OWNER', 'ADMIN'));
 
-// Analytics
-router.get('/dashboard', async (req, res) => {
-  try {
-    const response = await axios.get(`${AI_SERVICE_URL}/api/analytics/owner`, {
-      headers: aiHeaders(req)
-    });
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ detail: 'AI Service error' });
-  }
-});
-
-// Residents
-router.get('/residents', async (req, res) => {
-  try {
-    const response = await axios.get(`${AI_SERVICE_URL}/api/owner/residents`, {
-      headers: aiHeaders(req)
-    });
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ detail: 'AI Service error' });
-  }
-});
-
-// Issue Bill
-router.post('/issue-bill', async (req, res) => {
-  try {
-    const response = await axios.post(`${AI_SERVICE_URL}/api/owner/issue-bill`, req.body, {
-      headers: aiHeaders(req)
-    });
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ detail: 'AI Service error' });
-  }
-});
-
-// Properties
-router.get('/properties', async (req, res) => {
-  try {
-    const response = await axios.get(`${AI_SERVICE_URL}/api/owner/properties`, {
-      headers: aiHeaders(req)
-    });
-    res.json(response.data);
-  } catch (error) {
-    res.status(500).json({ detail: 'AI Service error' });
-  }
-});
+router.get('/dashboard', getOwnerDashboard);
+router.get('/properties', getOwnerProperties);
+router.post('/properties', createProperty);
+router.patch('/properties/:id', updateProperty);
+router.get('/residents', getOwnerResidents);
+router.get('/revenue', getOwnerRevenue);
+router.get('/bookings', getOwnerBookings);
+router.get('/agreements', getOwnerAgreements);
+router.patch('/agreements/:id/sign', ownerSignAgreement);
 
 export default router;

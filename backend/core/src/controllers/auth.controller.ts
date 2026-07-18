@@ -138,28 +138,60 @@ export const validate2FA = async (req: Request, res: Response) => {
 
 export const getMe = async (req: Request, res: Response) => {
   const user = (req as any).user;
-  if (!user) {
-    return res.status(401).json({ detail: 'Not authenticated' });
-  }
+  if (!user) return res.status(401).json({ detail: 'Not authenticated' });
 
   try {
     const dbUser = await prisma.user.findUnique({
-      where: { id: user.user_id }
+      where: { id: user.user_id },
+      include: {
+        goflex_score: true,
+        kyc: { select: { status: true, document_type: true } },
+        _count: { select: { bookings: true, complaints: true, owned_properties: true } },
+      },
     });
 
-    if (!dbUser) {
-      return res.status(404).json({ detail: 'User not found' });
-    }
+    if (!dbUser) return res.status(404).json({ detail: 'User not found' });
 
-    res.json({
-      id: dbUser.id,
-      username: dbUser.username,
-      email: dbUser.email,
-      role: dbUser.role
-    });
+    const { password_hash, ...safeUser } = dbUser;
+    res.json(safeUser);
   } catch (error) {
     console.error('Error fetching user profile:', error);
     res.status(500).json({ detail: 'Internal server error' });
   }
 };
 
+export const updateProfile = async (req: Request, res: Response) => {
+  const user_id = (req as any).user.user_id;
+  const { full_name, phone } = req.body;
+  try {
+    const updated = await prisma.user.update({
+      where: { id: user_id },
+      data: { full_name, phone },
+      select: { id: true, username: true, email: true, full_name: true, phone: true, role: true },
+    });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ detail: 'Failed to update profile.' });
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  const user_id = (req as any).user.user_id;
+  const { current_password, new_password } = req.body;
+  if (!current_password || !new_password) {
+    return res.status(400).json({ detail: 'current_password and new_password are required.' });
+  }
+  try {
+    const user = await prisma.user.findUnique({ where: { id: user_id } });
+    if (!user) return res.status(404).json({ detail: 'User not found.' });
+
+    const isMatch = await bcrypt.compare(current_password, user.password_hash);
+    if (!isMatch) return res.status(400).json({ detail: 'Current password is incorrect.' });
+
+    const hashed = await bcrypt.hash(new_password, 10);
+    await prisma.user.update({ where: { id: user_id }, data: { password_hash: hashed } });
+    res.json({ detail: 'Password changed successfully.' });
+  } catch (err) {
+    res.status(500).json({ detail: 'Failed to change password.' });
+  }
+};

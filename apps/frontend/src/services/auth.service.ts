@@ -10,6 +10,29 @@ export interface AuthUser {
   token?: string;
   full_name?: string;
   phone?: string;
+  referral_code?: string;
+  referred_by?: string;
+  created_at?: string;
+  goflex_score?: {
+    overall_score: number;
+    payment_score: number;
+    compliance_score: number;
+    complaint_score: number;
+    verification_score: number;
+    verification_badge: string;
+    is_verified: boolean;
+    maintenance_score?: number;
+    responsiveness_score?: number;
+  } | null;
+  kyc?: {
+    status: string;
+    document_type: string;
+  } | null;
+  _count?: {
+    bookings: number;
+    complaints: number;
+    owned_properties: number;
+  };
 }
 
 export interface LoginResponse {
